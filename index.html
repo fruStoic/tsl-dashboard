@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSL — Weekly Performance Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --navy:#111111; --gold:#BBC4CB; --gold-lt:#DDE1E4; --blue:#111111;
+  --bg:#F2F2F2; --surface:#FFFFFF; --surface2:#F8F8F8;
+  --border:#EEEEEE; --text:#111111; --muted:#888888; --faint:#AAAAAA;
+  --green:#27500A; --red:#A32D2D; --amber:#633806;
+  --lan:#111111; --beth:#BBC4CB;
+  --panel-w: 240px;
+  --panel-collapsed: 52px;
+  --trans: .28s cubic-bezier(.4,0,.2,1);
+}
+body.view-lanham   { --accent:#111111; --accent-lt:#F8F8F8; --accent-text:#111111; }
+body.view-bethesda { --accent:#BBC4CB; --accent-lt:#F0F1F3; --accent-text:#111111; }
+body.view-combined { --accent:#111111; --accent-lt:#F8F8F8; --accent-text:#111111; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; flex-direction:column; min-height:100vh; }
+
+/* ── HEADER ── */
+.hdr { background:var(--navy); padding:0 24px 0 0; display:flex; align-items:stretch; min-height:64px; z-index:100; position:sticky; top:0; }
+.hdr-toggle { width:var(--panel-collapsed); min-width:var(--panel-collapsed); display:flex; align-items:center; justify-content:center; padding:0; border-right:1px solid rgba(255,255,255,.08); transition:width var(--trans), min-width var(--trans); cursor:pointer; flex-shrink:0; gap:10px; overflow:hidden; }
+.hdr-toggle:hover { background:rgba(255,255,255,.06); }
+.hdr-toggle.open { width:var(--panel-w); min-width:var(--panel-w); justify-content:space-between; padding:0 16px 0 18px; }
+.hdr-brand { display:flex; align-items:center; gap:10px; }
+.logo-ring { width:32px; height:32px; border-radius:50%; border:1.5px solid rgba(187,196,203,.5); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:border-color var(--trans); }
+.logo-ring span { font-family:'Oswald',sans-serif; font-size:13px; font-weight:700; color:var(--gold); }
+.brand-text { overflow:hidden; max-width:0; opacity:0; transition:max-width var(--trans), opacity var(--trans); white-space:nowrap; }
+.hdr-toggle.open .brand-text { max-width:160px; opacity:1; }
+.brand-text h1 { font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; color:#fff; }
+.brand-text .sub { font-size:9px; color:rgba(255,255,255,.4); letter-spacing:.1em; text-transform:uppercase; }
+.toggle-arrow { color:rgba(255,255,255,.35); font-size:13px; flex-shrink:0; transition:transform var(--trans), color var(--trans); }
+.hdr-toggle.open .toggle-arrow { transform:rotate(180deg); color:rgba(255,255,255,.6); }
+
+/* Pulse hint — shown when panel is closed */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(187,196,203,.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(187,196,203,0); }
+  100% { box-shadow: 0 0 0 0 rgba(187,196,203,0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity:.5; transform:scale(1); }
+  50%       { opacity:1;  transform:scale(1.08); }
+}
+.hdr-toggle:not(.open) .logo-ring {
+  animation: pulse-ring 2s ease-out 1.5s 3, pulse-dot 2s ease-in-out 1.5s 3;
+  border-color: rgba(187,196,203,.8);
+}
+.hdr-toggle:not(.open):hover .logo-ring {
+  animation: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(187,196,203,.25);
+}
+.hdr-right { flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 0 0 20px; }
+.hdr-title { display:flex; align-items:center; gap:10px; }
+.hdr-title .week-pill { background:rgba(187,196,203,.15); border:1px solid rgba(187,196,203,.3); color:var(--gold); font-family:'Oswald',sans-serif; font-size:11px; padding:4px 11px; border-radius:0; }
+.view-label { display:inline-block; font-size:10px; font-weight:700; padding:2px 9px; border-radius:2px; background:var(--accent-lt); color:var(--accent-text); }
+.switcher { display:flex; background:rgba(255,255,255,.07); border-radius:0; padding:3px; border:1px solid rgba(255,255,255,.1); }
+.sw-btn { padding:5px 16px; border-radius:0; font-size:11px; font-weight:600; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,.5); transition:all .2s; font-family:'DM Sans',sans-serif; }
+.sw-btn:hover { color:rgba(255,255,255,.8); }
+body.view-lanham   .sw-btn[data-v="lanham"]  { background:var(--blue); color:#fff; }
+body.view-bethesda .sw-btn[data-v="bethesda"]{ background:var(--gold); color:var(--navy); }
+body.view-combined .sw-btn[data-v="combined"]{ background:rgba(255,255,255,.15); color:#fff; }
+
+/* ── LAYOUT SHELL ── */
+.shell { display:flex; flex:1; overflow:hidden; }
+
+/* ── LEFT PANEL ── */
+.panel { width:var(--panel-collapsed); min-width:var(--panel-collapsed); background:var(--navy); border-right:1px solid rgba(255,255,255,.07); display:flex; flex-direction:column; overflow:hidden; transition:width var(--trans), min-width var(--trans); flex-shrink:0; }
+.panel.open { width:var(--panel-w); min-width:var(--panel-w); }
+.panel-inner { width:var(--panel-w); overflow-y:auto; overflow-x:hidden; flex:1; padding-bottom:20px; opacity:0; pointer-events:none; transition:opacity var(--trans); }
+.panel.open .panel-inner { opacity:1; pointer-events:auto; transition-delay:.08s; }
+.panel-inner::-webkit-scrollbar { width:3px; }
+.panel-inner::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:2px; }
+
+.panel-section { margin-top:8px; }
+.panel-month { padding:10px 16px 6px; font-family:'Oswald',sans-serif; font-size:9px; font-weight:700; color:rgba(255,255,255,.3); letter-spacing:.12em; text-transform:uppercase; cursor:pointer; display:flex; align-items:center; justify-content:space-between; user-select:none; }
+.panel-month:hover { color:rgba(255,255,255,.5); }
+.panel-month .m-arrow { font-size:10px; transition:transform .2s; }
+.panel-month.closed .m-arrow { transform:rotate(-90deg); }
+.panel-month-items { overflow:hidden; transition:max-height .25s ease; max-height:500px; }
+.panel-month.closed + .panel-month-items { max-height:0; }
+
+.week-item { display:flex; align-items:center; gap:8px; padding:9px 16px; cursor:pointer; border-left:2px solid transparent; transition:all .15s; position:relative; }
+.week-item:hover { background:rgba(255,255,255,.05); }
+.week-item.active { background:rgba(187,196,203,.1); border-left-color:var(--gold); }
+.week-item .wi-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.2); flex-shrink:0; }
+.week-item.active .wi-dot { background:var(--gold); }
+.week-item .wi-label { font-size:11px; color:rgba(255,255,255,.5); white-space:nowrap; overflow:hidden; }
+.week-item.active .wi-label { color:rgba(255,255,255,.9); font-weight:600; }
+.week-item .wi-val { font-family:'Oswald',sans-serif; font-size:9px; color:rgba(255,255,255,.3); margin-left:auto; white-space:nowrap; }
+.week-item.active .wi-val { color:var(--gold-lt); }
+
+.panel-divider { height:1px; background:rgba(255,255,255,.06); margin:8px 16px; }
+
+
+
+/* ── MAIN CONTENT ── */
+.main { flex:1; overflow-y:auto; overflow-x:hidden; }
+.page { padding:24px 36px 48px; max-width:1400px; margin:0 auto; }
+
+/* ── SECTION HEADS ── */
+.sh { display:flex; align-items:center; gap:10px; margin:24px 0 12px; }
+.sh-line { flex:1; height:1px; background:var(--border); }
+.sh-label { font-family:'Oswald',sans-serif; font-size:9px; font-weight:700; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; }
+.sh-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+
+/* ── ALERT ── */
+.alert { background:#FAEEDA; border:1px solid #DDE1E4; border-radius:0; padding:10px 16px; font-size:11px; color:#633806; line-height:1.6; margin-bottom:18px; }
+.alert strong { font-weight:700; }
+
+/* ── HERO ── */
+.hero-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.hero-card { background:var(--surface); border-radius:0; padding:18px 20px; border:1px solid var(--border); position:relative; overflow:hidden; }
+.hero-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--accent); transition:background .2s; }
+.hero-card .lbl { font-size:9px; font-weight:700; color:var(--faint); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+.hero-card .big { font-family:'Oswald',sans-serif; font-size:32px; font-weight:700; color:var(--navy); line-height:1; }
+.hero-card .breakdown { margin-top:8px; display:flex; flex-direction:column; gap:3px; }
+.hero-card .br-row { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); }
+.dot6 { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.wow { font-size:10px; font-weight:600; margin-top:6px; }
+.wow.up { color:var(--green); } .wow.dn { color:var(--red); } .wow.mx { color:var(--muted); }
+
+/* ── KPI ── */
+.kpi-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; }
+.kpi { background:var(--surface); border-radius:0; padding:14px 16px; border:1px solid var(--border); }
+.kpi .kl { font-size:9px; font-weight:700; color:var(--faint); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+.kpi .kv { font-size:19px; font-weight:700; color:var(--navy); margin-bottom:4px; transition:all .15s; }
+.kpi .ks { font-size:10px; color:var(--muted); }
+
+/* ── CHARTS ── */
+.g2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.g3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.cc { background:var(--surface); border-radius:0; padding:20px 22px; border:1px solid var(--border); }
+.cc h3 { font-size:9px; font-weight:700; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:12px; }
+.cw { position:relative; width:100%; }
+.leg { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+.li { display:flex; align-items:center; gap:4px; font-size:10px; color:var(--muted); }
+.lsq { width:8px; height:8px; border-radius:2px; }
+
+/* ── WoW TREND CHART ── */
+.wow-trend { background:var(--surface); border-radius:0; padding:20px 22px; border:1px solid var(--border); }
+.wow-trend h3 { font-size:9px; font-weight:700; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px; }
+.wow-trend .trend-sub { font-size:10px; color:var(--faint); margin-bottom:14px; }
+
+/* ── LIABILITY ── */
+.liab-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.lc { background:var(--surface); border-radius:0; padding:20px 22px; border:1px solid var(--border); }
+.lc h3 { font-size:9px; font-weight:700; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:12px; }
+.lr { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
+.lr:last-child { border-bottom:none; }
+.ll { font-size:12px; color:var(--muted); }
+.lv { font-size:13px; font-weight:700; color:var(--navy); transition:all .15s; }
+.closing-bar { background:var(--navy); border-radius:0; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+.cb-label { font-size:9px; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.08em; }
+.cb-val { font-family:'Oswald',sans-serif; font-size:22px; font-weight:700; color:#fff; transition:all .15s; }
+.cb-sub { font-size:10px; color:var(--gold); margin-top:2px; }
+
+/* ── TABLE ── */
+.tc { background:var(--surface); border-radius:0; border:1px solid var(--border); overflow:hidden; }
+table { width:100%; border-collapse:collapse; font-size:11px; }
+th { font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:9px 12px; text-align:right; border-bottom:1.5px solid var(--border); background:var(--surface2); }
+th:first-child { text-align:left; }
+td { padding:9px 12px; text-align:right; border-bottom:1px solid var(--border); color:var(--text); }
+td:first-child { text-align:left; color:var(--muted); font-size:10px; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:var(--surface2); }
+.tsec td { background:var(--surface2); font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); padding:6px 12px; }
+.bdg { display:inline-block; padding:1px 6px; border-radius:2px; font-size:9px; font-weight:700; }
+.bb { background:#F8F8F8; color:#111111; }
+.bg { background:#F0F1F3; color:#111111; }
+.new-b { background:#EAF3DE; color:#27500A; font-size:9px; font-weight:700; padding:1px 6px; border-radius:2px; }
+.rec-b { background:#F8F8F8; color:#111111; font-size:9px; font-weight:700; padding:1px 6px; border-radius:2px; }
+
+/* col visibility */
+body.view-lanham   .col-B, body.view-lanham   .col-C { display:none; }
+body.view-bethesda .col-L, body.view-bethesda .col-C { display:none; }
+body.view-combined .col-L, body.view-combined .col-B { display:none; }
+
+/* ── RATE BADGES ── */
+.rate-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
+.rate-row:last-child { border-bottom:none; }
+.rate-label { font-size:11px; color:var(--muted); }
+.rate-pill { display:inline-flex; align-items:center; gap:6px; }
+.rate-val { font-size:14px; font-weight:700; }
+.rate-bar-wrap { width:80px; height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
+.rate-bar { height:100%; border-radius:3px; transition:width .4s ease; }
+.rate-section-head { font-family:'Oswald',sans-serif; font-size:9px; font-weight:700; color:var(--faint); letter-spacing:.1em; text-transform:uppercase; margin:14px 0 8px; }
+.rate-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+.rate-card { background:var(--surface2); border-radius:2px; padding:12px 14px; border:1px solid var(--border); }
+.rate-card .rc-label { font-size:9px; font-weight:700; color:var(--faint); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+.rate-card .rc-val { font-size:20px; font-weight:700; color:var(--navy); line-height:1; }
+.rate-card .rc-sub { font-size:10px; color:var(--muted); margin-top:4px; }
+.rate-card .rc-bar { height:3px; border-radius:2px; margin-top:8px; transition:width .4s ease; }
+.trend-spark { margin-top:6px; }
+
+/* ── MONTHLY VIEW ── */
+.monthly-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(187,196,203,.15);border:1px solid rgba(187,196,203,.4);color:var(--gold);font-family:'Oswald',sans-serif;font-size:10px;padding:3px 10px;border-radius:0;}
+.monthly-note{font-size:11px;color:var(--muted);margin-bottom:16px;padding:8px 14px;background:var(--surface2);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;line-height:1.6;}
+.monthly-section{display:none;}
+.weekly-section{display:block;}
+.mo-hero{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+.mo-kpi{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+.mo-stat{background:var(--surface);border-radius:0;padding:16px 18px 18px;border:1px solid var(--border);position:relative;overflow:hidden;}
+.mo-stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--gold);}
+.mo-stat .lbl{font-size:9px;font-weight:700;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;}
+.mo-stat .big{font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;color:var(--navy);line-height:1;}
+.mo-stat .sub{font-size:10px;color:var(--muted);margin-top:5px;}
+.mo-kpi-card{background:var(--surface);border-radius:0;padding:13px 14px;border:1px solid var(--border);}
+.mo-kpi-card .kl{font-size:9px;font-weight:700;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+.mo-kpi-card .kv{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.mo-kpi-card .ks{font-size:9px;color:var(--muted);}
+.week-sparkline{display:flex;align-items:flex-end;gap:3px;height:32px;margin-top:8px;}
+.spark-bar{background:var(--gold);border-radius:2px 2px 0 0;min-width:8px;transition:height .3s ease;}
+.spark-bar:last-child{background:var(--navy);}
+
+/* ── FOOTER ── */
+.ftr { background:var(--navy); padding:14px 36px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+.ftr p { font-size:10px; color:rgba(255,255,255,.3); }
+
+/* ── MOBILE BOTTOM NAV (week picker) ── */
+.mob-nav { display:none; }
+
+/* ══════════════════════════════════════════════════════════
+   TABLET  ≤ 900px
+══════════════════════════════════════════════════════════ */
+@media (max-width:900px) {
+  .hdr-right .tsl-wordmark { display:none; }
+  .hero-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .kpi-grid  { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .g3        { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .g3 > .cc[style*="grid-column:span 2"] { grid-column:span 2; }
+  .liab-grid { grid-template-columns:1fr; }
+  .page { padding:20px 24px 40px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE  ≤ 600px
+══════════════════════════════════════════════════════════ */
+@media (max-width:600px) {
+
+  /* Header */
+  .hdr { min-height:56px; padding:0 12px 0 0; flex-wrap:wrap; }
+  .hdr-toggle { width:48px !important; min-width:48px !important; }
+  .hdr-toggle.open { width:48px !important; min-width:48px !important; justify-content:center; padding:0; }
+  .hdr-toggle.open .brand-text { max-width:0 !important; opacity:0 !important; }
+  .hdr-toggle.open .toggle-arrow { transform:none !important; }
+  .hdr-right { padding:0 0 0 10px; gap:6px; flex-wrap:wrap; }
+  .hdr-title  { gap:6px; }
+  .week-pill  { font-size:10px; padding:3px 8px; }
+  .view-label { display:none; }
+  .sw-btn     { padding:4px 10px; font-size:10px; }
+
+  /* Side panel becomes full-screen overlay on mobile */
+  .shell { position:relative; }
+  .panel {
+    position:absolute; top:0; left:0; bottom:0; z-index:200;
+    width:0 !important; min-width:0 !important;
+    box-shadow:none;
+    transition:width var(--trans), box-shadow var(--trans);
+  }
+  .panel.open {
+    width:85vw !important; min-width:0 !important;
+    box-shadow:4px 0 32px rgba(0,0,0,.35);
+  }
+  /* Dim overlay behind open panel */
+  .panel-overlay {
+    display:none; position:absolute; inset:0; background:rgba(0,0,0,.45);
+    z-index:199; cursor:pointer;
+  }
+  .panel.open ~ .panel-overlay { display:block; }
+
+  /* Page */
+  .page { padding:16px 14px 80px; }
+
+  /* Hero: 2 cols → 1 col for small phones, 2 for wider */
+  .hero-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .hero-card .big { font-size:24px; }
+  .hero-card { padding:14px 14px 16px; }
+
+  /* KPI: 2 columns */
+  .kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .kpi { padding:12px 12px; }
+  .kpi .kv { font-size:16px; }
+  .kpi .ks { display:none; }
+
+  /* Charts: all single column */
+  .g2, .g3 { grid-template-columns:1fr; }
+  .g3 > .cc[style*="grid-column:span 2"] { grid-column:span 1; }
+  .cc { padding:16px; }
+  .cw[style*="height:210px"], .cw[style*="height:220px"] { height:180px !important; }
+  .cw[style*="height:180px"], .cw[style*="height:190px"] { height:160px !important; }
+  .cw[style*="height:200px"] { height:170px !important; }
+  .wow-trend { padding:16px; }
+
+  /* Liability */
+  .liab-grid { grid-template-columns:1fr; gap:12px; }
+  .lc { padding:16px; }
+  .closing-bar { padding:10px 14px; }
+  .cb-val { font-size:18px; }
+
+  /* Tables: horizontal scroll + hide source badge col on mobile */
+  .tc { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:0; }
+  table { min-width:380px; }
+  td, th { padding:8px 10px; }
+  .bdg, .new-b, .rec-b { display:none; }
+  .col-src { display:none; }
+  /* Membership table: hide plan col on very small */
+  .mem-plan { display:none; }
+
+  /* Section heads */
+  .sh { margin:20px 0 10px; }
+
+  /* Alert */
+  .alert { font-size:11px; padding:10px 12px; }
+
+  /* Footer */
+  .ftr { padding:12px 16px; }
+  .ftr p:last-child { display:none; }
+
+  /* Mobile bottom bar — week picker */
+  .mob-nav {
+    display:flex; position:fixed; bottom:0; left:0; right:0; z-index:300;
+    background:var(--navy); border-top:1px solid rgba(255,255,255,.1);
+    padding:0; height:56px; overflow-x:auto; overflow-y:hidden;
+    scrollbar-width:none;
+  }
+  .mob-nav::-webkit-scrollbar { display:none; }
+  .mob-week {
+    display:flex; align-items:center; flex-direction:column; justify-content:center;
+    padding:0 16px; gap:2px; cursor:pointer; white-space:nowrap; flex-shrink:0;
+    border-bottom:2px solid transparent; transition:all .15s;
+    min-width:80px;
+  }
+  .mob-week:hover { background:rgba(255,255,255,.06); }
+  .mob-week.active { border-bottom-color:var(--gold); }
+  .mob-week .mw-date { font-family:'Oswald',sans-serif; font-size:9px; color:rgba(255,255,255,.5); }
+  .mob-week.active .mw-date { color:rgba(255,255,255,.9); }
+  .mob-week .mw-val  { font-family:'Oswald',sans-serif; font-size:9px; color:rgba(255,255,255,.3); }
+  .mob-week.active .mw-val { color:var(--gold); }
+  .mob-nav-label {
+    display:flex; align-items:center; padding:0 12px 0 16px;
+    font-size:9px; font-weight:700; color:rgba(255,255,255,.2);
+    letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;
+    border-right:1px solid rgba(255,255,255,.06); flex-shrink:0;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SMALL PHONE  ≤ 390px
+══════════════════════════════════════════════════════════ */
+@media (max-width:390px) {
+  .hero-grid { grid-template-columns:1fr 1fr; }
+  .hero-card .big { font-size:22px; }
+  .sw-btn { padding:4px 8px; font-size:9px; }
+  .week-pill { font-size:9px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BRAND OVERRIDES — TSL Email Style Guide alignment
+   Oswald replaces Cormorant Garamond; typography needs adjustment
+   ═══════════════════════════════════════════════════════════ */
+
+/* Delta pill colors — align with brand guide (email spec) */
+:root {
+  --green:#27500A; --red:#A32D2D; --amber:#633806;
+  --green-bg:#EAF3DE; --red-bg:#FCEBEB; --amber-bg:#FAEEDA;
+}
+
+/* Combined view background — fix leftover cream tint */
+body.view-combined { --accent-lt:#F8F8F8; }
+
+/* Former Cormorant display elements — Oswald reads differently, tune weight + uppercase */
+.logo-ring span,
+.brand-text h1,
+.hero-card .big,
+.cb-val {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Small label elements (former Space Mono) — needs letter-spacing for label feel */
+.panel-month,
+.sh-label,
+.wi-val,
+.rate-section-head,
+.monthly-badge {
+  font-weight: 500 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase;
+}
+
+/* Section labels: slate grey accent per brand guide */
+.sh-label { color: var(--gold) !important; }
+.rate-section-head { color: var(--gold) !important; }
+
+/* KPI value tuning: Oswald condensed — a touch heavier reads better */
+.kpi .kv,
+.lv,
+.rate-card .rc-val { font-weight: 600; }
+
+/* Feature cards get 3px left slate border per brand guide */
+.monthly-note { border-left-color: var(--gold) !important; }
+
+/* Zero out any remaining rounded pill/badge in header */
+.hdr-title .week-pill,
+.sw-btn,
+.monthly-badge { border-radius: 0 !important; }
+
+/* Delta colors throughout — use brand spec */
+.up, .delta-up, [class*="delta"][class*="pos"] { color: var(--green) !important; }
+.down, .delta-down, [class*="delta"][class*="neg"] { color: var(--red) !important; }
+
+/* Prevent italic from any bold/small text browsers might auto-italicize */
+* { font-style: normal !important; }
+
+/* Hero and closing bar: keep dark, retain brand precision */
+.closing-bar { border-radius: 0; }
+.hero-card { border-radius: 0; }
+
+/* Chart series colors (data viz) — restrained brand palette
+   Available for JS to reference if needed:
+   --chart-1: #111111 (Lanham/primary)
+   --chart-2: #BBC4CB (Bethesda/accent)
+   --chart-3: #6B7885 (mid-slate, third series if needed)
+   --chart-4: #DDE1E4 (light slate, fourth) */
+:root {
+  --chart-1: #111111;
+  --chart-2: #BBC4CB;
+  --chart-3: #6B7885;
+  --chart-4: #DDE1E4;
+}
+</style>
+</head>
+<body class="view-combined">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-toggle" id="panelToggle" onclick="togglePanel()">
+    <div class="hdr-brand">
+      <div class="logo-ring"><span>SL</span></div>
+      <div class="brand-text">
+        <h1>Stretch Loft</h1>
+        <div class="sub">Reports</div>
+      </div>
+    </div>
+    <svg class="toggle-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-title">
+      <div class="week-pill" id="weekPill">Aug 31 – Sep 6, 2026</div>
+      <div class="view-label" id="vLabel">Combined</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="tsl-wordmark" style="font-size:10px;color:rgba(255,255,255,.3);font-family:'Oswald',sans-serif;">The Stretch Loft</span>
+      <div class="switcher">
+        <button class="sw-btn" data-v="lanham"   onclick="sv('lanham')">Lanham</button>
+        <button class="sw-btn" data-v="bethesda" onclick="sv('bethesda')">Bethesda</button>
+        <button class="sw-btn" data-v="combined" onclick="sv('combined')">Combined</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+
+  <!-- LEFT PANEL -->
+  <div class="panel" id="sidePanel">
+    <div class="panel-inner" id="panelInner">
+
+      <div class="panel-section">
+        <div class="panel-month" onclick="toggleMonth(this)">
+          <span>September 2026</span><span class="m-arrow">▾</span>
+        </div>
+        <div class="panel-month-items">
+          <div class="week-item active" onclick="loadWeek('w24')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Aug 31 – Sep 6</span>
+            <span class="wi-val">$15,929</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="panel-section">
+        <div class="panel-month" onclick="toggleMonth(this)">
+          <span>August 2026</span><span class="m-arrow">▾</span>
+        </div>
+        <div class="panel-month-items">
+          <div class="week-item" onclick="loadWeek('w23')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Aug 24 – 30</span>
+            <span class="wi-val">$18,419</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w22')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Aug 17 – 23</span>
+            <span class="wi-val">$13,885</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w21')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Aug 10 – 16</span>
+            <span class="wi-val">$17,779</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w20')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Aug 3 – 9 <span style="opacity:0.5;font-size:9px">·est</span></span>
+            <span class="wi-val">$22,886</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="panel-section">
+        <div class="panel-month" onclick="toggleMonth(this)">
+          <span>July 2026</span><span class="m-arrow">▾</span>
+        </div>
+        <div class="panel-month-items">
+          <div class="week-item" onclick="loadWeek('w19')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jul 27 – Aug 2 <span style="opacity:0.5;font-size:9px">·est</span></span>
+            <span class="wi-val">$20,926</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w18')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jul 20 – 26 <span style="opacity:0.5;font-size:9px">·est</span></span>
+            <span class="wi-val">$24,939</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w17')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jul 13 – 19 <span style="opacity:0.5;font-size:9px">·est</span></span>
+            <span class="wi-val">$20,223</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w16')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jul 6 – 12</span>
+            <span class="wi-val">$20,032</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w15')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jun 29 – Jul 5</span>
+            <span class="wi-val">$25,464</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="panel-section">
+        <div class="panel-month" onclick="toggleMonth(this)">
+          <span>June 2026</span><span class="m-arrow">▾</span>
+        </div>
+        <div class="panel-month-items">
+          <div class="week-item" onclick="loadWeek('w14')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jun 22 – 28</span>
+            <span class="wi-val">$23,188</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w13')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jun 15 – 21</span>
+            <span class="wi-val">$33,038</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w12')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jun 8 – 14</span>
+            <span class="wi-val">$23,589</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w11')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Jun 1 – 7</span>
+            <span class="wi-val">$29,709</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="panel-section">
+        <div class="panel-month" onclick="toggleMonth(this)">
+          <span>May 2026</span><span class="m-arrow">▾</span>
+        </div>
+        <div class="panel-month-items">
+          <div class="week-item" onclick="loadWeek('w10')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">May 25 – 31</span>
+            <span class="wi-val">$33,240</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w9')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">May 18 – 24</span>
+            <span class="wi-val">$24,956</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w8')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">May 11 – 17</span>
+            <span class="wi-val">$28,570</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w7')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">May 4 – 10</span>
+            <span class="wi-val">$24,386</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="panel-section">
+        <div class="panel-month" onclick="toggleMonth(this)">
+          <span>April 2026</span><span class="m-arrow">▾</span>
+        </div>
+        <div class="panel-month-items">
+          <div class="week-item" onclick="loadWeek('w6')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Apr 27 – May 3</span>
+            <span class="wi-val">$28,292</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w5')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Apr 20 – 26</span>
+            <span class="wi-val">$27,875</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w4')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Apr 13 – 19</span>
+            <span class="wi-val">$36,748</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w3')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Apr 6 – 12</span>
+            <span class="wi-val">$32,790</span>
+          </div>
+          <div class="week-item" onclick="loadWeek('w2')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Mar 30 – Apr 5</span>
+            <span class="wi-val">$29,358</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="panel-section">
+        <div class="panel-month" onclick="toggleMonth(this)"><span>Monthly</span><span class="m-arrow">▾</span></div>
+        <div class="panel-month-items">
+          <div class="week-item" onclick="loadMonthly('june2026')" id="panel-june2026">
+            <span class="wi-dot" style="background:var(--gold);"></span>
+            <span class="wi-label">June 2026</span>
+            <span class="wi-val">$109,524</span>
+          </div>
+          <div class="week-item" onclick="loadMonthly('may2026')" id="panel-may2026">
+            <span class="wi-dot" style="background:var(--gold);"></span>
+            <span class="wi-label">May 2026</span>
+            <span class="wi-val">$111,152</span>
+          </div>
+          <div class="week-item" onclick="loadMonthly('april2026')" id="panel-april2026">
+            <span class="wi-dot" style="background:var(--gold);"></span>
+            <span class="wi-label">April 2026</span>
+            <span class="wi-val">$97,413</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="panel-section">
+        <div class="panel-month" onclick="toggleMonth(this)">
+          <span>March 2026</span><span class="m-arrow">▾</span>
+        </div>
+        <div class="panel-month-items">
+          <div class="week-item" onclick="loadWeek('w1')">
+            <span class="wi-dot"></span>
+            <span class="wi-label">Mar 23 – 29</span>
+            <span class="wi-val">$26,255</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="panel-overlay" id="panelOverlay" onclick="togglePanel()"></div>
+
+  <!-- MAIN -->
+  <div class="main">
+  <div class="page" id="mainPage">
+
+  <!-- ALERT (dynamic) -->
+  <div id="weeklySection">
+  <div class="alert" id="alertBar"></div>
+
+  <!-- HERO -->
+  <div class="sh"><span class="sh-dot"></span><span class="sh-label">Weekly Snapshot</span><span class="sh-line"></span></div>
+  <div class="hero-grid">
+    <div class="hero-card">
+      <div class="lbl">Total Value</div>
+      <div class="big" id="h-tv"></div>
+      <div class="breakdown" id="h-tv-b">
+        <div class="br-row"><span class="dot6" style="background:var(--lan)"></span><span id="h-tv-l"></span></div>
+        <div class="br-row"><span class="dot6" style="background:var(--beth)"></span><span id="h-tv-bl"></span></div>
+      </div>
+      <div class="wow" id="h-tv-wow"></div>
+    </div>
+    <div class="hero-card">
+      <div class="lbl">Service Revenue</div>
+      <div class="big" id="h-rev"></div>
+      <div class="breakdown" id="h-rev-b">
+        <div class="br-row"><span class="dot6" style="background:var(--lan)"></span><span id="h-rev-l"></span></div>
+        <div class="br-row"><span class="dot6" style="background:var(--beth)"></span><span id="h-rev-bl"></span></div>
+      </div>
+      <div class="wow" id="h-rev-wow"></div>
+    </div>
+    <div class="hero-card">
+      <div class="lbl">Productivity</div>
+      <div class="big" id="h-prod"></div>
+      <div class="breakdown" id="h-prod-b">
+        <div class="br-row"><span class="dot6" style="background:var(--lan)"></span><span id="h-prod-l"></span></div>
+        <div class="br-row"><span class="dot6" style="background:var(--beth)"></span><span id="h-prod-bl"></span></div>
+      </div>
+      <div class="wow" id="h-prod-wow"></div>
+    </div>
+    <div class="hero-card">
+      <div class="lbl">Rebook Rate</div>
+      <div class="big" id="h-rb"></div>
+      <div class="breakdown" id="h-rb-b">
+        <div class="br-row"><span class="dot6" style="background:var(--lan)"></span><span id="h-rb-l"></span></div>
+        <div class="br-row"><span class="dot6" style="background:var(--beth)"></span><span id="h-rb-bl"></span></div>
+      </div>
+      <div class="wow" id="h-rb-wow"></div>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="sh"><span class="sh-dot"></span><span class="sh-label">Key Metrics</span><span class="sh-line"></span></div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kl">New Clients (NSR)</div><div class="kv" id="k-nc"></div><div class="ks" id="k-nc-s"></div></div>
+    <div class="kpi"><div class="kl">New EFT</div><div class="kv" id="k-neft"></div><div class="ks" id="k-neft-s"></div></div>
+    <div class="kpi"><div class="kl">Recurring EFT</div><div class="kv" id="k-reft"></div><div class="ks" id="k-reft-s"></div></div>
+    <div class="kpi"><div class="kl">Mem Cancellations</div><div class="kv" id="k-mcan"></div><div class="ks" id="k-mcan-s"></div></div>
+    <div class="kpi"><div class="kl">Retail</div><div class="kv" id="k-ret"></div><div class="ks" id="k-ret-s"></div></div>
+    <div class="kpi"><div class="kl">Avg Service Ticket</div><div class="kv" id="k-tkt"></div><div class="ks" id="k-tkt-s"></div></div>
+    <div class="kpi"><div class="kl">Online Booking %</div><div class="kv" id="k-onl"></div><div class="ks" id="k-onl-s"></div></div>
+    <div class="kpi"><div class="kl">Unique Guests</div><div class="kv" id="k-ug"></div><div class="ks" id="k-ug-s"></div></div>
+    <div class="kpi"><div class="kl">Discounts</div><div class="kv" id="k-disc"></div><div class="ks" id="k-disc-s"></div></div>
+    <div class="kpi"><div class="kl">Provider Request %</div><div class="kv" id="k-pr"></div><div class="ks" id="k-pr-s"></div></div>
+  </div>
+
+  <!-- CHARTS ROW 1 -->
+  <div class="sh"><span class="sh-dot"></span><span class="sh-label">Revenue Breakdown</span><span class="sh-line"></span></div>
+  <div class="g3">
+    <div class="cc" style="grid-column:span 2">
+      <h3>Revenue by Category</h3>
+      <div class="cw" style="height:210px"><canvas id="revChart"></canvas></div>
+    </div>
+    <div class="cc">
+      <h3>Revenue Mix</h3>
+      <div class="cw" style="height:178px"><canvas id="mixChart"></canvas></div>
+      <div class="leg" style="margin-top:8px;justify-content:center;">
+        <span class="li"><span class="lsq" style="background:#111111"></span>Services</span>
+        <span class="li"><span class="lsq" style="background:#BBC4CB"></span>EFT</span>
+        <span class="li"><span class="lsq" style="background:#111111"></span>Packages</span>
+        <span class="li"><span class="lsq" style="background:#27500A"></span>Retail</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-WEEK TREND -->
+  <div class="sh"><span class="sh-dot"></span><span class="sh-label">3-Week Trend</span><span class="sh-line"></span></div>
+  <div class="g2">
+    <div class="wow-trend">
+      <h3>Total Value &amp; Service Revenue</h3>
+      <div class="trend-sub">All three weeks — combined</div>
+      <div class="cw" style="height:180px"><canvas id="trendRevChart"></canvas></div>
+    </div>
+    <div class="wow-trend">
+      <h3>New Clients · Rebook % · Productivity</h3>
+      <div class="trend-sub">All three weeks — combined</div>
+      <div class="cw" style="height:180px"><canvas id="trendOpsChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 2 -->
+  <div class="sh"><span class="sh-dot"></span><span class="sh-label">Operations</span><span class="sh-line"></span></div>
+  <div class="g3">
+    <div class="cc">
+      <h3>Productivity vs Rebook Rate</h3>
+      <div class="cw" style="height:190px"><canvas id="prodChart"></canvas></div>
+    </div>
+    <div class="cc">
+      <h3>Service Mix (booked this week)</h3>
+      <div class="cw" style="height:190px"><canvas id="svcChart"></canvas></div>
+    </div>
+    <div class="cc">
+      <h3>Booking Source</h3>
+      <div class="cw" style="height:190px"><canvas id="bsrcChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- LIABILITY -->
+  <div class="sh"><span class="sh-dot"></span><span class="sh-label">Liability Balances &amp; Utilisation Rates</span><span class="sh-line"></span></div>
+  <div class="liab-grid">
+    <div class="lc">
+      <h3>Membership Liability</h3>
+      <div class="lr"><span class="ll">Opening Balance</span><span class="lv" id="ml-open"></span></div>
+      <div class="lr"><span class="ll">Accrued / Sold</span><span class="lv" id="ml-sold" style="color:var(--green)"></span></div>
+      <div class="lr"><span class="ll">Redemptions</span><span class="lv" id="ml-red" style="color:var(--amber)"></span></div>
+      <div class="lr"><span class="ll">Cancellations</span><span class="lv" id="ml-can"></span></div>
+      <div class="closing-bar">
+        <div><div class="cb-label">Closing Balance</div><div class="cb-sub" id="ml-csub"></div></div>
+        <div class="cb-val" id="ml-close"></div>
+      </div>
+      <!-- Rate metrics -->
+      <div class="rate-section-head" style="margin-top:18px;">Utilisation Rates</div>
+      <div class="rate-grid">
+        <div class="rate-card">
+          <div class="rc-label">Redemption Rate</div>
+          <div class="rc-val" id="ml-rr"></div>
+          <div class="rc-sub" id="ml-rr-sub">Redeemed ÷ Available</div>
+          <div class="rc-bar" id="ml-rr-bar" style="background:var(--amber);width:0%"></div>
+        </div>
+        <div class="rate-card">
+          <div class="rc-label">Penetration Rate</div>
+          <div class="rc-val" id="ml-pr"></div>
+          <div class="rc-sub" id="ml-pr-sub">Redeemed ÷ Opening Bal</div>
+          <div class="rc-bar" id="ml-pr-bar" style="background:var(--blue);width:0%"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="rate-row">
+          <span class="rate-label">Lanham redemption rate</span>
+          <div class="rate-pill">
+            <span class="rate-val" id="ml-rr-l" style="font-size:12px;color:var(--lan)"></span>
+            <div class="rate-bar-wrap"><div class="rate-bar" id="ml-rr-l-bar" style="background:var(--lan)"></div></div>
+          </div>
+        </div>
+        <div class="rate-row">
+          <span class="rate-label">Bethesda redemption rate</span>
+          <div class="rate-pill">
+            <span class="rate-val" id="ml-rr-b" style="font-size:12px;color:var(--beth)"></span>
+            <div class="rate-bar-wrap"><div class="rate-bar" id="ml-rr-b-bar" style="background:var(--beth)"></div></div>
+          </div>
+        </div>
+        <div class="rate-row">
+          <span class="rate-label">Net liability change</span>
+          <span class="rate-val" id="ml-net" style="font-size:13px;font-weight:700"></span>
+        </div>
+      </div>
+    </div>
+    <div class="lc">
+      <h3>Package Liability</h3>
+      <div class="lr"><span class="ll">Opening Balance</span><span class="lv" id="pl-open"></span></div>
+      <div class="lr"><span class="ll">Sold This Week</span><span class="lv" id="pl-sold" style="color:var(--green)"></span></div>
+      <div class="lr"><span class="ll">Redemptions</span><span class="lv" id="pl-red" style="color:var(--amber)"></span></div>
+      <div class="lr"><span class="ll">Expired</span><span class="lv" id="pl-exp"></span></div>
+      <div class="closing-bar">
+        <div><div class="cb-label">Closing Balance</div><div class="cb-sub" id="pl-csub"></div></div>
+        <div class="cb-val" id="pl-close"></div>
+      </div>
+      <!-- Rate metrics -->
+      <div class="rate-section-head" style="margin-top:18px;">Utilisation Rates</div>
+      <div class="rate-grid">
+        <div class="rate-card">
+          <div class="rc-label">Redemption Rate</div>
+          <div class="rc-val" id="pl-rr"></div>
+          <div class="rc-sub" id="pl-rr-sub">Redeemed ÷ Available</div>
+          <div class="rc-bar" id="pl-rr-bar" style="background:var(--amber);width:0%"></div>
+        </div>
+        <div class="rate-card">
+          <div class="rc-label">Expiry Rate</div>
+          <div class="rc-val" id="pl-er"></div>
+          <div class="rc-sub">Expired ÷ Available</div>
+          <div class="rc-bar" id="pl-er-bar" style="background:var(--red);width:0%"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="rate-row">
+          <span class="rate-label">Lanham redemption rate</span>
+          <div class="rate-pill">
+            <span class="rate-val" id="pl-rr-l" style="font-size:12px;color:var(--lan)"></span>
+            <div class="rate-bar-wrap"><div class="rate-bar" id="pl-rr-l-bar" style="background:var(--lan)"></div></div>
+          </div>
+        </div>
+        <div class="rate-row">
+          <span class="rate-label">Bethesda redemption rate</span>
+          <div class="rate-pill">
+            <span class="rate-val" id="pl-rr-b" style="font-size:12px;color:var(--beth)"></span>
+            <div class="rate-bar-wrap"><div class="rate-bar" id="pl-rr-b-bar" style="background:var(--beth)"></div></div>
+          </div>
+        </div>
+        <div class="rate-row">
+          <span class="rate-label">Lanham expiry rate</span>
+          <div class="rate-pill">
+            <span class="rate-val" id="pl-er-l" style="font-size:12px;color:var(--red)"></span>
+            <div class="rate-bar-wrap"><div class="rate-bar" id="pl-er-l-bar" style="background:var(--red)"></div></div>
+          </div>
+        </div>
+        <div class="rate-row">
+          <span class="rate-label">Net liability change</span>
+          <span class="rate-val" id="pl-net" style="font-size:13px;font-weight:700"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="g2" style="margin-top:16px;">
+    <div class="cc"><h3>Membership Balance Movement</h3><div class="cw" style="height:190px"><canvas id="memChart"></canvas></div></div>
+    <div class="cc"><h3>Package Balance Movement</h3><div class="cw" style="height:190px"><canvas id="pkgChart"></canvas></div></div>
+  </div>
+  <!-- 3-week rate trend -->
+  <div class="wow-trend" style="margin-top:16px;">
+    <h3>Redemption &amp; Expiry Rates — 3-Week Trend (Combined)</h3>
+    <div class="trend-sub">Tracks how actively clients are using prepaid value</div>
+    <div class="cw" style="height:180px"><canvas id="rateTrendChart"></canvas></div>
+  </div>
+
+  <!-- MEMBERSHIP DETAIL -->
+  <div class="sh"><span class="sh-dot"></span><span class="sh-label">Membership Activity</span><span class="sh-line"></span></div>
+  <div class="tc">
+    <table>
+      <thead><tr><th>Guest</th><th>Location</th><th>Plan</th><th>Type</th><th>Sale Date</th><th>Value</th></tr></thead>
+      <tbody id="mem-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- FULL TABLE -->
+  <div class="sh"><span class="sh-dot"></span><span class="sh-label">Full Weekly Report</span><span class="sh-line"></span></div>
+  <div class="tc">
+    <table>
+      <thead><tr><th>Metric</th><th class="col-L">Lanham</th><th class="col-B">Bethesda</th><th class="col-C">Combined</th><th class="col-src">Source</th></tr></thead>
+      <tbody id="reportTbody"></tbody>
+    </table>
+  </div>
+
+  </div><!-- end weeklySection -->
+
+  <!-- ══════════ MONTHLY SECTION ══════════ -->
+  <div class="monthly-section" id="monthlySection">
+    <div class="monthly-note" id="monthlyNote"></div>
+
+    <div class="sh"><span class="sh-dot"></span><span class="sh-label">Monthly Snapshot</span><span class="sh-line"></span></div>
+    <div class="mo-hero" id="moHero">
+      <div class="mo-stat"><div class="lbl">Total Value</div><div class="big" id="mo-tv">—</div><div class="sub" id="mo-tv-s"></div></div>
+      <div class="mo-stat"><div class="lbl">Service Revenue</div><div class="big" id="mo-rev">—</div><div class="sub" id="mo-rev-s"></div></div>
+      <div class="mo-stat"><div class="lbl">Avg Productivity</div><div class="big" id="mo-prod">—</div><div class="sub" id="mo-prod-s"></div></div>
+      <div class="mo-stat"><div class="lbl">Avg Rebook Rate</div><div class="big" id="mo-rb">—</div><div class="sub" id="mo-rb-s"></div></div>
+    </div>
+
+    <div class="sh"><span class="sh-dot"></span><span class="sh-label">Monthly KPIs</span><span class="sh-line"></span></div>
+    <div class="mo-kpi" id="moKpi">
+      <div class="mo-kpi-card"><div class="kl">New Clients (NSR)</div><div class="kv" id="mo-nc">—</div><div class="ks" id="mo-nc-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">New EFT</div><div class="kv" id="mo-neft">—</div><div class="ks" id="mo-neft-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">Recurring EFT</div><div class="kv" id="mo-reft">—</div><div class="ks" id="mo-reft-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">Mem Cancellations</div><div class="kv" id="mo-mcan" style="color:var(--green)">$0</div><div class="ks" id="mo-mcan-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">Retail Sales</div><div class="kv" id="mo-ret">—</div><div class="ks" id="mo-ret-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">Package Sales</div><div class="kv" id="mo-pkg">—</div><div class="ks" id="mo-pkg-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">Total Discounts</div><div class="kv" id="mo-disc" style="color:var(--amber)">—</div><div class="ks" id="mo-disc-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">Unique Guests</div><div class="kv" id="mo-ug">—</div><div class="ks" id="mo-ug-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">Total Invoices</div><div class="kv" id="mo-inv">—</div><div class="ks" id="mo-inv-s"></div></div>
+      <div class="mo-kpi-card"><div class="kl">Avg Service Ticket</div><div class="kv" id="mo-tkt">—</div><div class="ks" id="mo-tkt-s"></div></div>
+    </div>
+
+    <div class="sh"><span class="sh-dot"></span><span class="sh-label">Weekly Breakdown</span><span class="sh-line"></span></div>
+    <div class="g2">
+      <div class="cc"><h3>Total Value by Week</h3><div class="cw" style="height:190px"><canvas id="mo-weekRevChart"></canvas></div></div>
+      <div class="cc"><h3>New Clients by Week</h3><div class="cw" style="height:190px"><canvas id="mo-weekNcChart"></canvas></div></div>
+    </div>
+
+    <div class="sh"><span class="sh-dot"></span><span class="sh-label">Revenue Mix</span><span class="sh-line"></span></div>
+    <div class="g3">
+      <div class="cc" style="grid-column:span 2"><h3>Monthly Revenue by Category</h3><div class="cw" style="height:200px"><canvas id="mo-revCatChart"></canvas></div></div>
+      <div class="cc"><h3>Revenue Mix</h3><div class="cw" style="height:168px"><canvas id="mo-mixChart"></canvas></div><div class="leg" style="margin-top:8px;justify-content:center;"><span class="li"><span class="lsq" style="background:#111111"></span>Services</span><span class="li"><span class="lsq" style="background:#BBC4CB"></span>EFT</span><span class="li"><span class="lsq" style="background:#111111"></span>Packages</span><span class="li"><span class="lsq" style="background:#27500A"></span>Retail</span></div></div>
+    </div>
+
+    <div class="sh"><span class="sh-dot"></span><span class="sh-label">Liability Summary</span><span class="sh-line"></span></div>
+    <div class="liab-grid">
+      <div class="lc">
+        <h3>Membership Liability — Monthly Movement</h3>
+        <div class="lr"><span class="ll">Opening Balance (Apr 6)</span><span class="lv" id="mo-ml-open">—</span></div>
+        <div class="lr"><span class="ll">Total Accrued / Sold</span><span class="lv" id="mo-ml-sold" style="color:var(--green)">—</span></div>
+        <div class="lr"><span class="ll">Total Redemptions</span><span class="lv" id="mo-ml-red" style="color:var(--amber)">—</span></div>
+        <div class="lr"><span class="ll">Total Cancellations</span><span class="lv" id="mo-ml-can" style="color:var(--green)">—</span></div>
+        <div class="closing-bar"><div><div class="cb-label">Closing Balance (Apr 26)</div><div class="cb-sub" id="mo-ml-csub">L + B</div></div><div class="cb-val" id="mo-ml-close">—</div></div>
+        <div class="rate-section-head" style="margin-top:16px">Monthly Utilisation</div>
+        <div class="rate-grid">
+          <div class="rate-card"><div class="rc-label">Monthly Redeem Rate</div><div class="rc-val" id="mo-ml-rr">—</div><div class="rc-sub">Redeemed ÷ Available</div><div class="rc-bar" id="mo-ml-rr-bar" style="background:var(--amber);width:0"></div></div>
+          <div class="rate-card"><div class="rc-label">Net Liability Δ</div><div class="rc-val" id="mo-ml-net">—</div><div class="rc-sub">Closing vs Opening</div><div class="rc-bar" id="mo-ml-net-bar" style="background:var(--blue);width:0"></div></div>
+        </div>
+      </div>
+      <div class="lc">
+        <h3>Package Liability — Monthly Movement</h3>
+        <div class="lr"><span class="ll">Opening Balance (Apr 6)</span><span class="lv" id="mo-pl-open">—</span></div>
+        <div class="lr"><span class="ll">Total Sold</span><span class="lv" id="mo-pl-sold" style="color:var(--green)">—</span></div>
+        <div class="lr"><span class="ll">Total Redemptions</span><span class="lv" id="mo-pl-red" style="color:var(--amber)">—</span></div>
+        <div class="lr"><span class="ll">Total Expired</span><span class="lv" id="mo-pl-exp" style="color:var(--red)">—</span></div>
+        <div class="closing-bar"><div><div class="cb-label">Closing Balance (Apr 26)</div><div class="cb-sub" id="mo-pl-csub">L + B</div></div><div class="cb-val" id="mo-pl-close">—</div></div>
+        <div class="rate-section-head" style="margin-top:16px">Monthly Utilisation</div>
+        <div class="rate-grid">
+          <div class="rate-card"><div class="rc-label">Monthly Redeem Rate</div><div class="rc-val" id="mo-pl-rr">—</div><div class="rc-sub">Redeemed ÷ Available</div><div class="rc-bar" id="mo-pl-rr-bar" style="background:var(--amber);width:0"></div></div>
+          <div class="rate-card"><div class="rc-label">Expiry Rate</div><div class="rc-val" id="mo-pl-er">—</div><div class="rc-sub">Expired ÷ Available</div><div class="rc-bar" id="mo-pl-er-bar" style="background:var(--red);width:0"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Monthly Table -->
+    <div class="sh"><span class="sh-dot"></span><span class="sh-label">Full Monthly Report</span><span class="sh-line"></span></div>
+    <div class="tc">
+      <table>
+        <thead><tr><th>Metric</th><th class="col-L">Lanham</th><th class="col-B">Bethesda</th><th class="col-C">Combined</th></tr></thead>
+        <tbody id="moReportTbody"></tbody>
+      </table>
+    </div>
+  </div><!-- end monthly-section -->
+
+  </div><!-- end page -->
+  </div><!-- end main -->
+</div><!-- end shell -->
+
+<div class="ftr">
+  <p>The Stretch Loft &nbsp;·&nbsp; Lanham/Bowie &amp; Bethesda</p>
+  <p id="ftrWeek"></p>
+</div>
+
+<!-- MOBILE BOTTOM NAV — week picker, visible only on mobile -->
+<nav class="mob-nav" id="mobNav">
+  <div class="mob-nav-label">Weeks</div>
+  <div class="mob-week active" data-wk="w24" onclick="loadWeek('w24')">
+    <span class="mw-date">Aug 31–Sep 6</span>
+    <span class="mw-val">$15,929</span>
+  </div>
+  <div class="mob-week" data-wk="w23" onclick="loadWeek('w23')">
+    <span class="mw-date">Aug 24–30</span>
+    <span class="mw-val">$18,419</span>
+  </div>
+  <div class="mob-week" data-wk="w22" onclick="loadWeek('w22')">
+    <span class="mw-date">Aug 17–23</span>
+    <span class="mw-val">$13,885</span>
+  </div>
+  <div class="mob-week" data-wk="w21" onclick="loadWeek('w21')">
+    <span class="mw-date">Aug 10–16</span>
+    <span class="mw-val">$17,779</span>
+  </div>
+  <div class="mob-week" data-wk="w20" onclick="loadWeek('w20')">
+    <span class="mw-date">Aug 3–9 <span style="opacity:0.5">·est</span></span>
+    <span class="mw-val">$22,886</span>
+  </div>
+  <div class="mob-week" data-wk="w19" onclick="loadWeek('w19')">
+    <span class="mw-date">Jul 27–Aug 2 <span style="opacity:0.5">·est</span></span>
+    <span class="mw-val">$20,926</span>
+  </div>
+  <div class="mob-week" data-wk="w18" onclick="loadWeek('w18')">
+    <span class="mw-date">Jul 20–26 <span style="opacity:0.5">·est</span></span>
+    <span class="mw-val">$24,939</span>
+  </div>
+  <div class="mob-week" data-wk="w17" onclick="loadWeek('w17')">
+    <span class="mw-date">Jul 13–19 <span style="opacity:0.5">·est</span></span>
+    <span class="mw-val">$20,223</span>
+  </div>
+  <div class="mob-week" data-wk="w16" onclick="loadWeek('w16')">
+    <span class="mw-date">Jul 6–12</span>
+    <span class="mw-val">$20,032</span>
+  </div>
+  <div class="mob-week" data-wk="w15" onclick="loadWeek('w15')">
+    <span class="mw-date">Jun 29–Jul 5</span>
+    <span class="mw-val">$25,464</span>
+  </div>
+  <div class="mob-week" data-wk="w14" onclick="loadWeek('w14')">
+    <span class="mw-date">Jun 22–28</span>
+    <span class="mw-val">$23,188</span>
+  </div>
+  <div class="mob-week" data-wk="w13" onclick="loadWeek('w13')">
+    <span class="mw-date">Jun 15–21</span>
+    <span class="mw-val">$33,038</span>
+  </div>
+  <div class="mob-week" data-wk="w12" onclick="loadWeek('w12')">
+    <span class="mw-date">Jun 8–14</span>
+    <span class="mw-val">$23,589</span>
+  </div>
+  <div class="mob-week" data-wk="w11" onclick="loadWeek('w11')">
+    <span class="mw-date">Jun 1–7</span>
+    <span class="mw-val">$29,709</span>
+  </div>
+  <div class="mob-week" data-wk="w10" onclick="loadWeek('w10')">
+    <span class="mw-date">May 25–31</span>
+    <span class="mw-val">$33,240</span>
+  </div>
+  <div class="mob-week" data-wk="w9" onclick="loadWeek('w9')">
+    <span class="mw-date">May 18–24</span>
+    <span class="mw-val">$24,956</span>
+  </div>
+  <div class="mob-week" data-wk="w8" onclick="loadWeek('w8')">
+    <span class="mw-date">May 11–17</span>
+    <span class="mw-val">$28,570</span>
+  </div>
+  <div class="mob-week" data-wk="w7" onclick="loadWeek('w7')">
+    <span class="mw-date">May 4–10</span>
+    <span class="mw-val">$24,386</span>
+  </div>
+  <div class="mob-week" data-wk="w6" onclick="loadWeek('w6')">
+    <span class="mw-date">Apr 27–May 3</span>
+    <span class="mw-val">$28,292</span>
+  </div>
+  <div class="mob-week" data-wk="w5" onclick="loadWeek('w5')">
+    <span class="mw-date">Apr 20–26</span>
+    <span class="mw-val">$27,875</span>
+  </div>
+  <div class="mob-week" data-wk="w4" onclick="loadWeek('w4')">
+    <span class="mw-date">Apr 13–19</span>
+    <span class="mw-val">$36,748</span>
+  </div>
+  <div class="mob-week" data-wk="w3" onclick="loadWeek('w3')">
+    <span class="mw-date">Apr 6–12</span>
+    <span class="mw-val">$32,790</span>
+  </div>
+  <div class="mob-week" data-wk="w2" onclick="loadWeek('w2')">
+    <span class="mw-date">Mar 30–Apr 5</span>
+    <span class="mw-val">$29,358</span>
+  </div>
+  <div class="mob-week" data-wk="w1" onclick="loadWeek('w1')">
+    <span class="mw-date">Mar 23–29</span>
+    <span class="mw-val">$26,255</span>
+  </div>
+  <div class="mob-week" data-wk="monthly-june2026" onclick="loadMonthly('june2026')" style="border-left:2px solid var(--gold);padding-left:12px;">
+    <span class="mw-date" style="color:var(--gold);">Jun Monthly</span>
+    <span class="mw-val" style="color:var(--gold);">$109,524</span>
+  </div>
+  <div class="mob-week" data-wk="monthly-may2026" onclick="loadMonthly('may2026')" style="border-left:2px solid var(--gold);padding-left:12px;">
+    <span class="mw-date" style="color:var(--gold);">May Monthly</span>
+    <span class="mw-val" style="color:var(--gold);">$111,152</span>
+  </div>
+  <div class="mob-week" data-wk="monthly-april2026" onclick="loadMonthly('april2026')" style="border-left:2px solid var(--gold);padding-left:12px;">
+    <span class="mw-date" style="color:var(--gold);">Apr Monthly</span>
+    <span class="mw-val" style="color:var(--gold);">$97,413</span>
+  </div>
+</nav>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════
+const WEEKS = {
+  w1: {
+    label:'Mar 23 – 29, 2026', shortLabel:'Mar 23–29', totalValC: 26255,
+    alert:'No major alerts this week. Clean baseline — zero membership cancellations, rebook rate strong at Bethesda (66.7%).',
+    loc:{
+      lanham:{tv:20844,rev:13511,prod:55.3,rb:42.0,nc:40,neft:'12/$3,318',neftC:12,neftV:3318,reft:3318,mcan:0,ret:327,tkt:188,onl:30.9,ug:105,disc:2349,pr:21.9,revCats:[13511,3318,6705,327],svc:{'New Client Stretch':40,'Stretch @ The Loft':66,'Ben The Baptist':9,'Massage':3,'Premium':2},bsrc:{'Zenoti':28,'Online':20,'Zenoti-Mobile':8,'Voice':2,'POS':1},ml:{open:49349,sold:3318,red:2064,can:0,close:50603},pl:{open:61141,sold:6705,red:2405,exp:3813,close:61628}},
+      bethesda:{tv:5411,rev:2549,prod:47.5,rb:66.7,nc:4,neft:'4/$1,113',neftC:4,neftV:1113,reft:1113,mcan:0,ret:124,tkt:134,onl:24.2,ug:20,disc:902,pr:27.8,revCats:[2549,1113,2060,124],svc:{'New Client Stretch':4,'Stretch @ The Loft':15},bsrc:{'Zenoti':4,'Online':3},ml:{open:31390,sold:1113,red:1549,can:0,close:30954},pl:{open:27375,sold:2060,red:1168,exp:292,close:27975}},
+    },
+    // NOTE: detailed memberships list for Mar 23–29 was not provided in the
+    // source export; the previous file contained April-dated rows clearly
+    // copy-pasted from w2. Aggregate totals above (12/$3,318 L · 4/$1,113 B
+    // = 16 new EFT) are correct from the weekly numbers, but the per-member
+    // detail rows have been cleared until the real Mar 23–29 export is
+    // re-run. Re-export the membership detail for that week to repopulate.
+    memberships:[],
+  },
+  w2: {
+    label:'Mar 30 – Apr 5, 2026', shortLabel:'Mar 30–Apr 5', totalValC: 29358,
+    alert:'⚠ Package expirations at Lanham: <strong>$4,840</strong>. Bethesda service revenue low at <strong>$881</strong> (utilization 26.7%). First membership cancellation at Lanham: <strong>$977</strong>.',
+    loc:{
+      lanham:{tv:26172,rev:15497,prod:70.0,rb:51.5,nc:30,neft:'11/$3,129',neftC:11,neftV:3129,reft:3129,mcan:977,ret:482,tkt:141,onl:21.8,ug:113,disc:3328,pr:25.7,revCats:[15497,3129,7129,482],svc:{'New Client Stretch':30,'Stretch @ The Loft':90,'Premium':2,'Enhancements':1},bsrc:{'Zenoti':22,'Online':5,'Zenoti-Mobile':2},ml:{open:50603,sold:3129,red:3427,can:977,close:49329},pl:{open:61628,sold:7129,red:3863,exp:4840,close:60054}},
+      bethesda:{tv:3185,rev:881,prod:26.7,rb:57.1,nc:8,neft:'3/$837',neftC:3,neftV:837,reft:1116,mcan:0,ret:142,tkt:126,onl:45.5,ug:14,disc:172,pr:42.9,revCats:[881,837,1620,142],svc:{'New Client Stretch':8,'Stretch @ The Loft':6},bsrc:{'Zenoti':2,'Online':1},ml:{open:31094,sold:1116,red:838,can:0,close:31372},pl:{open:27975,sold:1620,red:416,exp:0,close:29179}},
+    },
+    memberships:[
+      {n:'Montekeya Newman',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 5',val:299},
+      {n:'Deonte Jackson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 5',val:299},
+      {n:'Raven Purvis',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 4',val:299},
+      {n:'Chekesha Kidd',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 5',val:299},
+      {n:'Breanna Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 4',val:279},
+      {n:'Douglas Vereen',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 3',val:279},
+      {n:'Kim Corbett',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 2',val:279},
+      {n:'Brenda Fleming',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 2',val:279},
+      {n:'Marcus Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 1',val:279},
+      {n:'Grace Mayberry',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Mar 30',val:279},
+      {n:'Avion Sobers',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Mar 30',val:279},
+      {n:'Janelle Duffy',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Mar 30',val:279},
+      {n:'Evangela Brown',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 1',val:279},
+      {n:'Tobey Royal',loc:'Bethesda',plan:'Donotuse — Flex 2',type:'rec',date:'Apr 1',val:259},
+    ],
+  },
+  w3: {
+    label:'Apr 6 – 12, 2026', shortLabel:'Apr 6–12', totalValC: 32790,
+    alert:'📈 <strong>Best week yet (at the time):</strong> Total value $32,790. Lanham productivity 68.1%, rebook 56.7%. New clients 46. <strong>Watch:</strong> Lanham package expirations $2,347. Bethesda outperformed Lanham on new EFT (8 vs 5 new members).',
+    loc:{
+      lanham:{tv:27386,rev:15758,prod:68.1,rb:56.7,nc:41,neft:'5/$1,385',neftC:5,neftV:1385,reft:1664,mcan:0,ret:366,tkt:154,onl:35.0,ug:130,disc:2797,pr:19.8,revCats:[15758,1385,7785,366],svc:{'New Client Stretch':61,'Stretch @ The Loft':90,'Ben The Baptist':3,'Enhancements':7,'Massage':3,'Premium':4},bsrc:{'Zenoti':24,'Online':14,'Zenoti-Mobile':5,'Voice':1},ml:{open:49329,sold:1664,red:3080,can:0,close:47634},pl:{open:60054,sold:10640,red:3365,exp:2347,close:64983}},
+      bethesda:{tv:5404,rev:1996,prod:58.1,rb:64.3,nc:5,neft:'8/$2,223',neftC:8,neftV:2223,reft:2223,mcan:0,ret:65,tkt:143,onl:45.2,ug:15,disc:350,pr:50.0,revCats:[1996,2223,980,65],svc:{'New Client Stretch':5,'Stretch @ The Loft':13},bsrc:{'Online':5,'Zenoti':1},ml:{open:31372,sold:2223,red:946,can:0,close:32370},pl:{open:29179,sold:1520,red:546,exp:147,close:30665}},
+    },
+    memberships:[
+      {n:'Chris Sutton',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 11',val:299},
+      {n:'Sandra Wright',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 12',val:299},
+      {n:'Dana Plummer',loc:'Lanham',plan:'Donotuse-Flex Plan 2',type:'rec',date:'Apr 12',val:229},
+      {n:'Datrell Ward',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 6',val:299},
+      {n:'Toniere Lee',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 10',val:279},
+      {n:'Jonathan McReynolds',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 9',val:279},
+      {n:'Shereada Clarke',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 7',val:279},
+      {n:'Tovah May',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 12',val:279},
+      {n:'Crystal Smith',loc:'Bethesda',plan:'OLD 2-30min stretch',type:'rec',date:'Apr 12',val:209},
+      {n:'Keli Thomas',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 7',val:279},
+      {n:'Stacey Dixon',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 7',val:279},
+      {n:'Latish Gilliard',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 6',val:279},
+      {n:'Quinci Moody',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 6',val:279},
+      {n:'Ogi Oseji',loc:'Bethesda',plan:'Donotuse-Flex Plan 2',type:'rec',date:'Apr 6',val:320},
+    ],
+  },
+  w4: {
+    label:'Apr 13 – 19, 2026', shortLabel:'Apr 13–19', totalValC: 36748,
+    alert:'🏆 <strong>Record week at the time:</strong> $36,748. Lanham 75% productivity. New clients 54. Lanham EFT 21 memberships / $5,970. <strong>Watch:</strong> Refunds $1,553. Package expiry $2,824.',
+    loc:{
+      lanham:{tv:29995,rev:17815,prod:75.0,rb:44.5,nc:39,neft:'4/$1,196',neftC:4,neftV:1196,reft:6249,mcan:0,ret:675,tkt:131,onl:22.4,ug:140,disc:3028,pr:22.1,revCats:[17815,5970,4320,675],svc:{'New Client Stretch':42,'Stretch @ The Loft':82,'Ben The Baptist':3,'Enhancements':4,'Premium':5},bsrc:{'Zenoti':28,'Online':9,'POS':2},ml:{open:47634,sold:6249,red:3080,can:0,close:50525},pl:{open:64983,sold:6480,red:4142,exp:2824,close:63417}},
+      bethesda:{tv:6753,rev:3170,prod:55.4,rb:61.1,nc:15,neft:'0/$0',neftC:0,neftV:0,reft:1116,mcan:0,ret:87,tkt:176,onl:34.3,ug:25,disc:531,pr:25.0,revCats:[3170,1116,2100,87],svc:{'New Client Stretch':15,'Stretch @ The Loft':14},bsrc:{'Zenoti':5,'Online':5},ml:{open:32231,sold:1116,red:868,can:0,close:32479},pl:{open:30665,sold:2640,red:1211,exp:147,close:31947}},
+    },
+    memberships:[
+      {n:'Anthony Webb',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 15',val:299},
+      {n:'Collene Wilson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 15',val:299},
+      {n:'Marlen Giles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 14',val:299},
+      {n:'Emma Gbedemah',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 14',val:299},
+      {n:'Steve Walker',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 19',val:260},
+      {n:'Doris Cook',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 18',val:279},
+      {n:'Marva Parker',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 17',val:279},
+      {n:'Cheronda Albury',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 16',val:299},
+      {n:'Donnika Stance',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 16',val:299},
+      {n:'Tiffany Crawford',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 16',val:279},
+      {n:'Adrian Davis',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 16',val:279},
+      {n:'Felisa Burrell',loc:'Lanham',plan:'Donotuse-Flex Plan 2',type:'rec',date:'Apr 16',val:279},
+      {n:'Janice Haskins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 14',val:299},
+      {n:'Crystal Eubanks',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 14',val:279},
+      {n:'Ronald Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 14',val:279},
+      {n:'Vianka Hardy',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 14',val:279},
+      {n:'Camille Horton',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 14',val:279},
+      {n:'Jamal Blackwell',loc:'Lanham',plan:'Donotuse-Flex Plan 2',type:'rec',date:'Apr 14',val:249},
+      {n:'Matthew Johnson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 13',val:299},
+      {n:'Dineda Nyepan',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 13',val:279},
+      {n:'Keely Walston',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 13',val:279},
+      {n:'Katrice Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 15',val:279},
+      {n:'James Peay',loc:'Bethesda',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Apr 16',val:499},
+      {n:'LeRoy Dock',loc:'Bethesda',plan:'OLD 4-30min stretch',type:'rec',date:'Apr 15',val:297},
+      {n:'Raykyle Highsmith',loc:'Bethesda',plan:'Donotuse-Flex Plan 2',type:'rec',date:'Apr 14',val:320},
+    ],
+  },
+  w5: {
+    label:'Apr 20 – 26, 2026', shortLabel:'Apr 20–26', totalValC: 27875,
+    alert:'📉 <strong>Pullback week:</strong> $27,875 (–$8,873 vs record). Lanham productivity held at 69.9%, rebook 51.7%. New clients 41. <strong>Watch:</strong> Bethesda utilization dropped to 39.5%. Package expiry declining ($1,467 combined — best in 4 weeks). Refunds at Lanham $906.',
+    loc:{
+      lanham:{tv:23993,rev:13438,prod:69.9,rb:51.7,nc:34,neft:'4/$1,196',neftC:4,neftV:1196,reft:4754,mcan:0,ret:669,tkt:136,onl:26.5,ug:116,disc:2765,pr:20.7,invC:170,rebC:47,revCats:[13438,4196,4120,669],svc:{'New Client Stretch':34,'Stretch @ The Loft':71,'Enhancements':2,'Premium':6,'Massage @ The Loft':1},bsrc:{'Zenoti':11,'Online':8,'Zenoti-Mobile':2},ml:{open:50525,sold:4754,red:2706,can:0,close:52015},pl:{open:63417,sold:7060,red:4230,exp:880,close:65367}},
+      bethesda:{tv:3882,rev:1998,prod:39.5,rb:46.7,nc:7,neft:'1/$299',neftC:1,neftV:299,reft:299,mcan:0,ret:111,tkt:133,onl:24.0,ug:20,disc:657,pr:20.0,invC:25,rebC:7,revCats:[1998,299,1080,111],svc:{'New Client Stretch':7,'Stretch @ The Loft':11},bsrc:{'Zenoti':4,'Online':1},ml:{open:32479,sold:299,red:1270,can:0,close:31508},pl:{open:31947,sold:1080,red:327,exp:587,close:32114}},
+    },
+    memberships:[
+      {n:'Maria Luz Bolo Mohaba',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 26',val:299},
+      {n:'Ashlee Brown',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 25',val:299},
+      {n:'Veronica Stubbs',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 24',val:299},
+      {n:'Larry Waye Jr',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 22',val:299},
+      {n:'Randall Olade',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Apr 22',val:299},
+      {n:'Dominique Pender',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 26',val:279},
+      {n:'Angel Wyatt',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 25',val:279},
+      {n:'Erika Washington',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 25',val:279},
+      {n:'Kelly Taylor',loc:'Lanham',plan:'Donotuse-Flex Plan 2',type:'rec',date:'Apr 24',val:249},
+      {n:'Semia Hackett',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 23',val:279},
+      {n:'Angela Woods',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 23',val:279},
+      {n:'Tenilla Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 21',val:279},
+      {n:'Lorenzo Miller',loc:'Lanham',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Apr 21',val:499},
+      {n:'Lauren Stevens',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 20',val:279},
+      {n:"D'Andre Charles",loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 20',val:299},
+      {n:'Marcel Chesson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 20',val:279},
+      {n:'Trena Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 20',val:279},
+    ],
+  },
+  w6: {
+    label:'Apr 27 – May 3, 2026', shortLabel:'Apr 27–May 3', totalValC: 28292,
+    alert:'🔄 <strong>Second consecutive pullback:</strong> $28,292. Lanham service revenue strong at $15,515 — productivity 66%. Bethesda bouncing back to 51.2%. New EFT solid at 20 memberships / $5,597 — Bethesda contributed 6. <strong>Watch:</strong> Lanham package expiry elevated again at $4,040. Only 35 new clients combined.',
+    loc:{
+      lanham:{tv:24598,rev:15515,prod:66.0,rb:49.0,nc:31,neft:'1/$299',neftC:1,neftV:299,reft:3946,mcan:0,ret:518,tkt:144,onl:23.4,ug:113,disc:3470,pr:18.3,invC:154,rebC:49,revCats:[15515,3946,3615,518],svc:{'New Client Stretch':31,'Stretch @ The Loft':76,'Enhancements':1,'Premium':3,'Ben The Baptist':1,'Massage @ The Loft':2},bsrc:{'Zenoti':20,'Online':7,'Zenoti-Mobile':1},ml:{open:52015,sold:3946,red:3642,can:0,close:52319},pl:{open:65514,sold:7125,red:3073,exp:4040,close:65526}},
+      bethesda:{tv:3694,rev:1714,prod:51.2,rb:40.0,nc:4,neft:'6/$1,651',neftC:6,neftV:1651,reft:1651,mcan:0,ret:14,tkt:171,onl:33.3,ug:20,disc:228,pr:30.0,invC:27,rebC:4,revCats:[1714,1651,0,14],svc:{'New Client Stretch':4,'Stretch @ The Loft':9},bsrc:{'Zenoti':1,'Online':1},ml:{open:31508,sold:1651,red:1052,can:0,close:32107},pl:{open:32114,sold:0,red:700,exp:0,close:31414}},
+    },
+    memberships:[
+      {n:'Sacoyia Todd',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 1',val:299},
+      {n:'Douglas Vereen',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 3',val:279},
+      {n:'Kim Corbett',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 2',val:279},
+      {n:'Brenda Fleming',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 2',val:279},
+      {n:'Michele Johnson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 1',val:279},
+      {n:'Marcus Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 1',val:279},
+      {n:'Janelle Duffy',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 30',val:279},
+      {n:'Grace Mayberry',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 30',val:279},
+      {n:'Avion Sobers',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 30',val:279},
+      {n:'Datrell Ward',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Apr 29',val:299},
+      {n:'Ashley Walter',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 28',val:279},
+      {n:'Lois Brooks',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 28',val:279},
+      {n:'Roman Smith',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 28',val:279},
+      {n:'Kandace Latson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 27',val:279},
+      {n:'Evangela Brown',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 1',val:279},
+      {n:'Tobey Royal',loc:'Bethesda',plan:'Donotuse-Flex Plan 2',type:'rec',date:'May 1',val:259},
+      {n:'Kevin Jacobs',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 29',val:258},
+      {n:'Enjoli DeGrasse',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 29',val:279},
+      {n:'Jimmy Sanders',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Apr 27',val:279},
+      {n:'Sean Wilson',loc:'Bethesda',plan:'OLD 4-30min stretch',type:'rec',date:'Apr 27',val:297},
+    ],
+  },
+  w7: {
+    label:'May 4 – 10, 2026', shortLabel:'May 4–10', totalValC: 24386,
+    alert:'📉 <strong>Third consecutive pullback:</strong> $24,386 (–$3,906 vs prior week, lowest since Mar 30). Lanham steady — productivity 66.4%, rebook climbed to 56.5%, 32 new clients. Bethesda soft — only 3 new clients booked, rebook dropped to 27.3%. New EFT only 2 sales / $598 (vs 7 / $1,950 prior). <strong>Watch:</strong> Bethesda momentum stalling — service rev $1,707, 12 total appointments.',
+    loc:{
+      lanham:{tv:19487,rev:14623,prod:66.4,rb:56.5,nc:32,neft:'0/$0',neftC:0,neftV:0,reft:2013,mcan:0,ret:63,tkt:148,onl:36.5,ug:109,disc:3374,pr:22.3,invC:148,rebC:52,revCats:[14623,2013,1080,63],svc:{'Stretch @ The Loft':65,'New Client Stretch':32,'Premium':5,'Massage @ The Loft':4,'Ben The Baptist':1},bsrc:{'Zenoti':66,'Online':26,'Zenoti-Mobile':8,'MyZen':5,'Voice':2},ml:{open:52319,sold:1714,red:2970,can:0,close:51063},pl:{open:65999,sold:1620,red:3005,exp:1173,close:63441}},
+      bethesda:{tv:4899,rev:1707,prod:54.4,rb:27.3,nc:3,neft:'2/$598',neftC:2,neftV:598,reft:1456,mcan:0,ret:187,tkt:155,onl:25.0,ug:16,disc:372,pr:27.3,invC:24,rebC:3,revCats:[1707,2054,1080,187],svc:{'Stretch @ The Loft':8,'New Client Stretch':3,'Ben The Baptist':1},bsrc:{'Zenoti':8,'Online':3,'MyZen':1},ml:{open:32107,sold:1755,red:1110,can:0,close:32752},pl:{open:31414,sold:1080,red:978,exp:540,close:30976}},
+    },
+    memberships:[
+      {n:'Mukul Nerurkar',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'May 10',val:299},
+      {n:'Toniere Lee',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 10',val:279},
+      {n:'Jonathan McReynolds',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 9',val:279},
+      {n:'Stacey Dixon',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 7',val:279},
+      {n:'Shereada Clarke',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 7',val:279},
+      {n:'Quinci Moody',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 6',val:279},
+      {n:'Latish Gilliard',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 6',val:279},
+      {n:'Ogi Oseji',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 6',val:320},
+      {n:'Chekesha Kidd',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'May 5',val:299},
+      {n:'Montekeya Newman',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 5',val:299},
+      {n:'DEONTE JACKSON',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 5',val:299},
+      {n:'Danielle McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'May 4',val:299},
+      {n:'Raven Purvis',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 4',val:299},
+      {n:'Breanna Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 4',val:279},
+    ],
+  },
+  w8: {
+    label:'May 11 – 17, 2026', shortLabel:'May 11–17', totalValC: 28570,
+    alert:'📈 <strong>Rebound week:</strong> $28,570 (+$4,184 vs prior). EFT billing cycle was strong — recurring EFT $7,583 (more than double last week). Bethesda showed signs of life: rebook recovered to 63.6%, new clients doubled to 6, provider requests 61.5%. Lanham productivity climbed to 71% but service revenue dipped (–$2,666) on fewer new clients (32→23). <strong>Watch:</strong> First material cancellation hit in weeks — Lanham mem-cancellations $2,649. Lanham package expiry spiked to $5,373.',
+    loc:{
+      lanham:{tv:23828,rev:11957,prod:71.0,rb:62.0,nc:23,neft:'2/$598',neftC:2,neftV:598,reft:5680,mcan:2649,ret:498,tkt:142,onl:31.9,ug:96,disc:2976,pr:25.0,invC:144,rebC:49,revCats:[11957,6278,4460,498],svc:{'Stretch @ The Loft':67,'New Client Stretch':23,'Premium':5,'Massage @ The Loft':3},bsrc:{'Zenoti':60,'Online':25,'MyZen':8,'Zenoti-Mobile':4,'Voice':1},ml:{open:51203,sold:5700,red:3084,can:2649,close:51169},pl:{open:63048,sold:7260,red:2998,exp:5373,close:61936}},
+      bethesda:{tv:4742,rev:2276,prod:34.3,rb:63.6,nc:6,neft:'1/$299',neftC:1,neftV:299,reft:1903,mcan:0,ret:48,tkt:207,onl:50.0,ug:18,disc:288,pr:61.5,invC:28,rebC:7,revCats:[2276,2202,0,48],svc:{'Stretch @ The Loft':9,'New Client Stretch':6,'Enhancements':1},bsrc:{'Zenoti':7,'Online':7,'MyZen':2},ml:{open:32752,sold:1903,red:1394,can:0,close:33260},pl:{open:30976,sold:0,red:304,exp:0,close:30672}},
+    },
+    memberships:[
+      {n:'Marva Parker',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 17',val:279},
+      {n:'Tiffany Crawford',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 16',val:279},
+      {n:'Cheronda Albury',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 16',val:299},
+      {n:'James Peay',loc:'Bethesda',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'May 16',val:499},
+      {n:'Felisa Burrell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 16',val:279},
+      {n:'Veronica Stubbs',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 15',val:299},
+      {n:'Anthony Webb',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 15',val:299},
+      {n:'Katrice Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 15',val:279},
+      {n:'Collene Wilson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 15',val:299},
+      {n:'LeRoy Dock',loc:'Bethesda',plan:'OLD 4-30min stretch',type:'rec',date:'May 15',val:297},
+      {n:'Jamal Blackwell',loc:'Lanham',plan:'Donotuse-Flex Plan 2',type:'rec',date:'May 14',val:249},
+      {n:'Crystal Eubanks',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 14',val:279},
+      {n:'Vianka Hardy',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 14',val:279},
+      {n:'Janice Haskins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 14',val:299},
+      {n:'Emma Gbedemah',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 14',val:299},
+      {n:'Raykyle Highsmith',loc:'Bethesda',plan:'Donotuse-Flex Plan 2',type:'rec',date:'May 14',val:320},
+      {n:'Marlen Giles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 14',val:299},
+      {n:'Ronald Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 14',val:279},
+      {n:'Matthew Johnson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 13',val:299},
+      {n:'Dineda Nyepan',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 13',val:279},
+      {n:'Keely Walston',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 13',val:279},
+      {n:'Tovah May',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 12',val:279},
+      {n:'Sandra Wright',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 12',val:299},
+      {n:'Dana Plummer',loc:'Lanham',plan:'Donotuse-Flex Plan 2',type:'rec',date:'May 12',val:229},
+      {n:'Crystal Smith',loc:'Bethesda',plan:'OLD 2-30min stretch',type:'rec',date:'May 12',val:209},
+      {n:'LIsa Watkins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 11',val:299},
+      {n:'Valencia Bush',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'May 11',val:299},
+      {n:'Joseph Swann',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 11',val:299},
+      {n:'Chris Sutton',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'May 11',val:299},
+    ],
+  },
+  w9: {
+    label:'May 18 – 24, 2026', shortLabel:'May 18–24', totalValC: 24956,
+    alert:'🔀 <strong>Mixed week:</strong> $24,956 (–$3,614 vs prior). Service revenue actually <em>climbed</em> $2,885 across both centers — but the EFT cycle ran cold. <strong>Zero new EFT sales</strong> (first time in the data series) and recurring EFT halved ($7,583 → $3,579). Bethesda productivity recovered hard: 34.3% → 57.1%, service rev +33%. Lanham steady at 70% productivity, 27 NSR new clients. <strong>Watch:</strong> Bethesda had zero membership activity all week — no sales, no recurring billings. Package expiry values back-filled from w10 opening balances (Lanham $1,003, Bethesda $2,137).',
+    loc:{
+      lanham:{tv:21774,rev:14096,prod:70.0,rb:52.9,nc:27,neft:'0/$0',neftC:0,neftV:0,reft:3579,mcan:0,ret:389,tkt:158,onl:34.1,ug:103,disc:3380,pr:26.7,invC:138,rebC:45,revCats:[14096,3579,2700,389],svc:{'Stretch @ The Loft':67,'New Client Stretch':27,'Premium':4,'Ben The Baptist':1,'Enhancements':1},bsrc:{'Zenoti':71,'Online':21,'MyZen':4,'Zenoti-Mobile':3,'Voice':1},ml:{open:51169,sold:3579,red:3209,can:0,close:51539},pl:{open:61936,sold:3780,red:2292,exp:1003,close:62421}},
+      bethesda:{tv:3182,rev:3022,prod:57.1,rb:52.6,nc:6,neft:'0/$0',neftC:0,neftV:0,reft:0,mcan:0,ret:20,tkt:159,onl:34.6,ug:21,disc:595,pr:21.1,invC:26,rebC:10,revCats:[3022,0,0,20],svc:{'Stretch @ The Loft':14,'New Client Stretch':6},bsrc:{'Zenoti':13,'Online':4,'MyZen':3},ml:{open:33260,sold:0,red:1462,can:0,close:31799},pl:{open:30672,sold:640,red:1013,exp:2137,close:28162}},
+    },
+    memberships:[
+      {n:'Kelly Taylor',loc:'Lanham',plan:'Donotuse-Flex Plan 2',type:'rec',date:'May 24',val:249},
+      {n:'Roman Smith',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 23',val:279},
+      {n:'Semia Hackett',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 23',val:279},
+      {n:'Angela Woods',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 23',val:279},
+      {n:'Randall Olade',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 22',val:299},
+      {n:'Larry Waye Jr',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 22',val:299},
+      {n:'Tenilla Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 21',val:279},
+      {n:'Lorenzo Miller',loc:'Lanham',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'May 21',val:499},
+      {n:'D\'Andre Charles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 20',val:299},
+      {n:'Marcel Chesson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 20',val:279},
+      {n:'Steve Walker',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 19',val:260},
+      {n:'Doris Cook',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 18',val:279},
+    ],
+  },
+  w10: {
+    label:'May 25 – 31, 2026', shortLabel:'May 25–31', totalValC: 33240,
+    alert:'🚀 <strong>Major rebound + EFT engine restart:</strong> $33,240 (+$8,284 vs prior, highest weekly total of May). Service revenue +$1,974 to $19,092. NSR new clients <strong>surged to 57</strong> (vs 33) — Lanham 45, Bethesda doubled to 12. 9 new EFT sales / $2,691 reverses last week\'s zero-EFT week. Lanham productivity 73.1% (highest in May). <strong>Watch:</strong> Bethesda productivity actually dipped (57.1% → 50.0%) despite the new client surge — capacity getting tight. Lanham package expiry continues lower at $1,273.',
+    loc:{
+      lanham:{tv:27297,rev:16162,prod:73.1,rb:49.0,nc:45,neft:'7/$2,093',neftC:7,neftV:2093,reft:3388,mcan:0,ret:619,tkt:151,onl:25.7,ug:138,disc:2830,pr:24.2,invC:187,rebC:47,revCats:[16162,5481,3623,619],svc:{'Stretch @ The Loft':82,'New Client Stretch':45,'Premium':6,'Enhancements':3,'Ben The Baptist':1},bsrc:{'Zenoti':100,'Online':23,'Zenoti-Mobile':10,'MyZen':3,'Voice':1},ml:{open:51390,sold:5202,red:3114,can:0,close:53477},pl:{open:62421,sold:4963,red:4464,exp:1273,close:61647}},
+      bethesda:{tv:5943,rev:2930,prod:50.0,rb:53.3,nc:12,neft:'2/$598',neftC:2,neftV:598,reft:1412,mcan:0,ret:18,tkt:183,onl:31.2,ug:21,disc:277,pr:26.7,invC:32,rebC:8,revCats:[2930,2010,540,18],svc:{'Stretch @ The Loft':12,'New Client Stretch':12,'Ben The Baptist':1},bsrc:{'Zenoti':15,'Online':7,'MyZen':2,'Voice':1},ml:{open:31799,sold:2010,red:846,can:0,close:32962},pl:{open:28162,sold:1080,red:800,exp:440,close:28002}},
+    },
+    memberships:[
+      {n:'Brittny Drayton',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 30',val:299},
+      {n:'Jen Casey',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'May 30',val:299},
+      {n:'Weddy Youn',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 30',val:299},
+      {n:'Brian Baylor',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'May 30',val:299},
+      {n:'AVION SOBERS',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 30',val:279},
+      {n:'Janelle Duffy',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 30',val:279},
+      {n:'Grace Mayberry',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 30',val:279},
+      {n:'Marvin Wilson',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 30',val:279},
+      {n:'Vivian Carter',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 29',val:299},
+      {n:'Tania JOSEPH',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 29',val:299},
+      {n:'Datrell Ward',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 29',val:299},
+      {n:'Kevin Jacobs',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 29',val:258},
+      {n:'Mercedes White',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 28',val:279},
+      {n:'Lois Brooks',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 28',val:279},
+      {n:'Ashley Walter',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 28',val:279},
+      {n:'Anthony Holloway',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 27',val:299},
+      {n:'Aaron Dixon',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 27',val:299},
+      {n:'Kevin Jackson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'May 27',val:299},
+      {n:'Jimmy Jimmy Sanders',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 27',val:279},
+      {n:'Kandace Latson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 27',val:279},
+      {n:'Sean Wilson',loc:'Bethesda',plan:'OLD 4-30min stretch',type:'rec',date:'May 27',val:297},
+      {n:'Maria Luz Bolo Mohaba',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'May 26',val:299},
+      {n:'Dominique Pender',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 26',val:279},
+      {n:'Ashlee Brown',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'May 25',val:299},
+      {n:'Angel Wyatt',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 25',val:279},
+      {n:'Erika Washington',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'May 25',val:279},
+    ],
+  },
+  w11: {
+    label:'Jun 1 – 7, 2026', shortLabel:'Jun 1–7', totalValC: 29709,
+    alert:'⚡ <strong>Lanham hits series-high productivity:</strong> $29,709 (–$3,531 vs prior, but the headline pullback hides a strong story). Service revenue actually <em>climbed</em> $163 to $19,255. <strong>Lanham productivity 80.0%</strong> — highest in the entire 11-week series — service rev +$1,217 to $17,379. <strong>11 new EFT sales / $3,289</strong> — highest since the Mar 23–29 baseline week (which had 16/$4,431), and the strongest result of the May–June stretch. <strong>Watch:</strong> Bethesda backslid hard — productivity 50% → 42.9%, new clients halved (12 → 7), service rev down $1,054. Lanham package sales jumped ($8,340 accrued vs $1,260 collected — $7,080 sold-but-unpaid AR to watch).',
+    loc:{
+      lanham:{tv:25076,rev:17379,prod:80.0,rb:44.3,nc:45,neft:'8/$2,392',neftC:8,neftV:2392,reft:1973,mcan:279,ret:427,tkt:157,onl:28.8,ug:119,disc:3242,pr:21.8,invC:170,rebC:47,revCats:[17379,4365,1260,427],svc:{'Stretch @ The Loft':63,'New Client Stretch':45,'Massage @ The Loft':3,'Premium':3,'Ben The Baptist':2,'Enhancements':2},bsrc:{'Zenoti':76,'Online':28,'Zenoti-Mobile':11,'MyZen':3},ml:{open:54055,sold:4086,red:3374,can:279,close:54488},pl:{open:61793,sold:8340,red:4001,exp:2722,close:63411}},
+      bethesda:{tv:4633,rev:1876,prod:42.9,rb:75.0,nc:7,neft:'3/$897',neftC:3,neftV:897,reft:1994,mcan:0,ret:5,tkt:156,onl:32.0,ug:15,disc:302,pr:25.0,invC:25,rebC:9,revCats:[1876,2891,0,5],svc:{'Stretch @ The Loft':24,'New Client Stretch':7},bsrc:{'Zenoti':26,'Online':4,'Zenoti-Mobile':1},ml:{open:32962,sold:2612,red:1066,can:0,close:34508},pl:{open:27462,sold:0,red:360,exp:0,close:27102}},
+    },
+    memberships:[
+      {n:'Candice Thompson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 7',val:299},
+      {n:'Monica Hayes',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 7',val:299},
+      {n:'Stacey Dixon',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 7',val:279},
+      {n:'Kerry Ann Nakouye',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 7',val:299},
+      {n:'Ashley Duncan',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 6',val:299},
+      {n:'Latish Gilliard',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 6',val:279},
+      {n:'Quinci Moody',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 6',val:279},
+      {n:'Ogi Oseji',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 6',val:320},
+      {n:'Darius Moore',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 5',val:299},
+      {n:'Darlene Slaughter',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 5',val:299},
+      {n:'Danielle McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 4',val:299},
+      {n:'Breanna Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 4',val:279},
+      {n:'Sharnisse Rozier',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 3',val:299},
+      {n:'Douglas Vereen',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 3',val:279},
+      {n:'Kiristin Reid',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 3',val:299},
+      {n:'Michelle Stevenson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 3',val:299},
+      {n:'Sean Cook',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 3',val:299},
+      {n:'Chris Howard',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 3',val:299},
+      {n:'Kim Corbett',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 2',val:279},
+      {n:'Brenda Fleming',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 2',val:279},
+      {n:'Sacoyia Todd',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 1',val:299},
+      {n:'Michele Johnson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 1',val:279},
+      {n:'Marcus Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 1',val:279},
+      {n:'Evangela Brown',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 1',val:279},
+      {n:'Tobey Royal',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 1',val:259},
+    ],
+  },
+  w12: {
+    label:'Jun 8 – 14, 2026', shortLabel:'Jun 8–14', totalValC: 23589,
+    alert:'🔻 <strong>Lanham pullback, Bethesda recovery:</strong> $23,589 (–$6,120 vs prior — second-largest WoW drop in the 12-week series, after w4→w5\'s –$8,873). Service revenue down $4,154 — Lanham gave back most of last week\'s gains (rev $17,379 → $11,630, productivity 80% → 63%, NSR new clients 45 → 25). <strong>Bethesda swung the other way:</strong> service rev +85% to $3,471, productivity 43% → 61%, rebook 75% → 62%. Combined new clients 52 → 32. New EFT normalized at 5/$1,495 after w11\'s 11-sale spike; recurring EFT held at $5,073 (second-best of the May–Jun stretch). <strong>Watch:</strong> Big combined package expiry of $4,295 (Lanham $3,115, Bethesda $1,180) dragged PL liability down ~$6,690 net.',
+    loc:{
+      lanham:{tv:17621,rev:11630,prod:63.4,rb:52.8,nc:25,neft:'4/$1,196',neftC:4,neftV:1196,reft:3667,mcan:0,ret:321,tkt:155,onl:26.4,ug:91,disc:3181,pr:22.1,invC:121,rebC:38,revCats:[11630,4863,0,321],svc:{'Stretch @ The Loft':58,'New Client Stretch':25,'Premium':5,'Massage @ The Loft':1,'Enhancements':1,'Ben The Baptist':1},bsrc:{'Zenoti':65,'Online':19,'MyZen':5,'Voice':1,'Zenoti-Mobile':1},ml:{open:54339,sold:4564,red:3832,can:0,close:55071},pl:{open:63411,sold:1320,red:3814,exp:3115,close:57801}},
+      bethesda:{tv:5968,rev:3471,prod:61.3,rb:61.9,nc:7,neft:'1/$299',neftC:1,neftV:299,reft:1406,mcan:0,ret:7,tkt:158,onl:17.1,ug:25,disc:1045,pr:4.8,invC:35,rebC:13,revCats:[3471,1705,540,7],svc:{'Stretch @ The Loft':26,'New Client Stretch':7},bsrc:{'Zenoti':22,'MyZen':6,'Online':4,'Zenoti-Mobile':1},ml:{open:34508,sold:1705,red:2023,can:0,close:34190},pl:{open:27102,sold:540,red:440,exp:1180,close:26022}},
+    },
+    memberships:[
+      {n:'Vianka Hardy',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 14',val:279},
+      {n:'Marlen Giles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 14',val:299},
+      {n:'Jamal Blackwell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 14',val:249},
+      {n:'Christopher Coyne',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 14',val:299},
+      {n:'Ronald Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 14',val:279},
+      {n:'Crystal Eubanks',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 14',val:279},
+      {n:'Janice Haskins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 14',val:299},
+      {n:'Natalia Zackery',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 13',val:299},
+      {n:'Keely Walston',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 13',val:279},
+      {n:'Matthew Johnson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 13',val:299},
+      {n:'Candyce Jones',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 13',val:299},
+      {n:'Raykyle Highsmith',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 13',val:320},
+      {n:'Tovah May',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 12',val:279},
+      {n:'Sandra Wright',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 12',val:299},
+      {n:'Crystal Smith',loc:'Bethesda',plan:'OLD 2- 30 min stretch visits',type:'rec',date:'Jun 12',val:209},
+      {n:'Dana Plummer',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 12',val:229},
+      {n:'LIsa Watkins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 11',val:299},
+      {n:'Valencia Bush',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 11',val:299},
+      {n:'Joseph Swann',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 11',val:299},
+      {n:'Mukul Nerurkar',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 10',val:299},
+      {n:'Toniere Lee',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 10',val:279},
+      {n:'T.Pope Pope',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 8',val:299},
+      {n:'Marcia Collins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 8',val:299},
+    ],
+  },
+  w13: {
+    label:'Jun 15 – 21, 2026', shortLabel:'Jun 15–21', totalValC: 33038,
+    alert:'🚀 <strong>Series-record rebound:</strong> $33,038 (+$9,449 vs prior — the largest WoW gain in the 13-week series, exceeding w9→w10\'s +$8,284). Service revenue +$4,322 to $19,423. <strong>Lanham productivity 85.9% — new series high</strong> (prior best: w11\'s 80.0%), service rev +$3,994 to $15,624. <strong>Bethesda quietly excellent:</strong> 4 new EFT (vs 1 last week, their best in the series), prod 64%, service rev +$328 to $3,799. <strong>Watch:</strong> Lanham gross recurring EFT of $6,932 includes ~$3,005 in failed billing attempts (5× Britalia King at $549, 1× Steve Walker at $260, all Suspended-Pending-Tries). Real billed recurring EFT closer to $3,927. Lanham $2,511 in membership cancellations — second material can-out since w8.',
+    loc:{
+      lanham:{tv:26470,rev:15624,prod:85.9,rb:45.2,nc:25,neft:'1/$299',neftC:1,neftV:299,reft:6932,mcan:2511,ret:644,tkt:156,onl:19.8,ug:109,disc:4388,pr:18.8,invC:157,rebC:42,revCats:[15624,7231,3870,644],svc:{'Stretch @ The Loft':72,'New Client Stretch':25,'Ben The Baptist':4,'Premium':3},bsrc:{'Zenoti':87,'Online':11,'Zenoti-Mobile':4,'MyZen':1,'Voice':1},ml:{open:54772,sold:4226,red:4650,can:2511,close:51837},pl:{open:57801,sold:4950,red:3413,exp:900,close:58439}},
+      bethesda:{tv:6568,rev:3799,prod:64.0,rb:58.3,nc:8,neft:'4/$1,196',neftC:4,neftV:1196,reft:796,mcan:0,ret:173,tkt:152,onl:25.0,ug:29,disc:461,pr:33.3,invC:44,rebC:14,revCats:[3799,1992,0,173],svc:{'Stretch @ The Loft':19,'New Client Stretch':8},bsrc:{'Zenoti':23,'Online':3,'MyZen':1},ml:{open:34190,sold:1992,red:1300,can:0,close:34882},pl:{open:25154,sold:0,red:180,exp:0,close:24974}},
+    },
+    memberships:[
+      {n:'Tenilla Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 21',val:279},
+      {n:'Tenilla Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 21',val:279},
+      {n:'Lorenzo Miller',loc:'Lanham',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Jun 21',val:499},
+      {n:'Kayla Friedland',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 21',val:299},
+      {n:'Justyce Watson',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 20',val:299},
+      {n:'Eva Mutunga',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 20',val:299},
+      {n:'Deena Robinson',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 20',val:299},
+      {n:'D\'Andre Charles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 20',val:299},
+      {n:'Marcel Chesson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 20',val:279},
+      {n:'Pamela Hardnett',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 19',val:299},
+      {n:'Steve Walker',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 19',val:260},
+      {n:'Doris Cook',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 18',val:279},
+      {n:'Britalia King',loc:'Lanham',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Jun 17',val:549},
+      {n:'Britalia King',loc:'Lanham',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Jun 17',val:549},
+      {n:'Marva Parker',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 17',val:279},
+      {n:'Britalia King',loc:'Lanham',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Jun 17',val:549},
+      {n:'Britalia King',loc:'Lanham',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Jun 17',val:549},
+      {n:'Britalia King',loc:'Lanham',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Jun 17',val:549},
+      {n:'Cheronda Albury',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 16',val:299},
+      {n:'Tiffany Crawford',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 16',val:279},
+      {n:'Felisa Burrell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 16',val:279},
+      {n:'James Peay',loc:'Bethesda',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Jun 16',val:499},
+      {n:'Anthony Webb',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 15',val:299},
+      {n:'Collene Wilson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 15',val:299},
+      {n:'Katrice Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 15',val:279},
+      {n:'LeRoy Dock',loc:'Bethesda',plan:'OLD 4 - 30 minute stretch vis',type:'rec',date:'Jun 15',val:297},
+    ],
+  },
+  w14: {
+    label:'Jun 22 – 28, 2026', shortLabel:'Jun 22–28', totalValC: 23188,
+    alert:'⚠️ <strong>Sharp NSR slowdown:</strong> $23,188 (–$9,850 vs prior — largest WoW drop in the 14-week series, exceeding w4→w5\'s –$8,873). NSR new clients collapsed from 33 to 9 (–73%) — Lanham 25 → 7, Bethesda 8 → 2. Total invoice count down ~30% both centers. Service revenue –$7,045 to $12,378. <strong>But the EFT engine stayed strong:</strong> 8 new EFT / $2,372 (Lanham\'s 7/$2,073 is its second-best new-EFT week in the series). Lanham productivity held at 77.8% — the existing book worked hard despite light traffic. Bethesda rebook spiked to 82.3% — series high. <strong>Watch:</strong> Lanham package expiry $4,935 (heaviest since w8\'s $5,373); is this a summer-vacation lull or a real demand softening?',
+    loc:{
+      lanham:{tv:18295,rev:9852,prod:77.8,rb:57.4,nc:7,neft:'7/$2,073',neftC:7,neftV:2073,reft:4235,mcan:0,ret:402,tkt:145,onl:18.4,ug:74,disc:2626,pr:20.3,invC:109,rebC:35,revCats:[9852,6308,1538,402],svc:{'Stretch @ The Loft':48,'New Client Stretch':7,'Premium':6,'Enhancements':1},bsrc:{'Zenoti':50,'Online':8,'Voice':2,'Zenoti-Mobile':1,'MyZen':1},ml:{open:52097,sold:6009,red:3289,can:0,close:54817},pl:{open:57659,sold:1538,red:1820,exp:4935,close:52442}},
+      bethesda:{tv:4893,rev:2526,prod:52.9,rb:82.3,nc:2,neft:'1/$299',neftC:1,neftV:299,reft:875,mcan:0,ret:44,tkt:133,onl:20.7,ug:21,disc:772,pr:11.8,invC:29,rebC:14,revCats:[2526,1174,1080,44],svc:{'Stretch @ The Loft':15,'New Client Stretch':2},bsrc:{'Zenoti':11,'MyZen':4,'Online':2},ml:{open:34882,sold:1174,red:1354,can:0,close:34702},pl:{open:24974,sold:1080,red:180,exp:900,close:24974}},
+    },
+    memberships:[
+      {n:'Zoe Foster',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'new',date:'Jun 28',val:279},
+      {n:'Ashley Walter',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 28',val:279},
+      {n:'Lois Brooks',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 28',val:279},
+      {n:'Mercedes White',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 28',val:279},
+      {n:'Roman Smith',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 28',val:279},
+      {n:'Aaron Dixon',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 27',val:299},
+      {n:'Jimmy Jimmy Sanders',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 27',val:279},
+      {n:'Kandace Latson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 27',val:279},
+      {n:'Sean Wilson',loc:'Bethesda',plan:'OLD 4 - 30 minute stretch vis',type:'rec',date:'Jun 27',val:297},
+      {n:'Staci Burrough',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 26',val:299},
+      {n:'Dominique Pender',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 26',val:279},
+      {n:'Maria Luz Bolo Mohaba',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 26',val:299},
+      {n:'Heather Walker',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 26',val:299},
+      {n:'Chanza Baytop',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 26',val:299},
+      {n:'Kevin Jackson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 26',val:299},
+      {n:'Ebony Ford',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 26',val:299},
+      {n:'Nytisha Finger',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 25',val:299},
+      {n:'Ashlee Brown',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 25',val:299},
+      {n:'Angel Wyatt',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 25',val:279},
+      {n:'Erika Washington',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 24',val:279},
+      {n:'Kelly Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 24',val:249},
+      {n:'Semia Hackett',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 23',val:279},
+      {n:'Angela Woods',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 23',val:279},
+      {n:'Joy Oyedele',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 22',val:299},
+      {n:'Natash Jones',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 22',val:299},
+      {n:'Randall Olade',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 22',val:299},
+    ],
+  },
+  w15: {
+    label:'Jun 29 – Jul 5, 2026', shortLabel:'Jun 29–Jul 5', totalValC: 25464,
+    alert:'📈 <strong>Modest rebound, EFT engine hums:</strong> $25,464 (+$2,276 vs w14). Service revenue essentially flat (+$439 to $12,817). <strong>NSR new clients stayed soft at 7</strong> (Lanham 5, Bethesda 2) — the third straight sub-10 week suggests the summer/holiday-adjacent lull is real. <strong>But EFT is strong:</strong> 12 new EFT / $3,588 (Lanham 4, Bethesda 8), recurring EFT +$2,403 to $7,513. <strong>Lanham productivity 79.8% and rebook 71.9%</strong> — rebook is a new series high for Lanham. <strong>Watch:</strong> Bethesda\'s 8 new-EFT count includes <strong>4 duplicate rows for Amirah McCoy</strong> (all cycle 1, all Jun 30, all $299) — could be family-plan enrollment, batch entry, or data error. Real distinct new members at Bethesda = 5 (Jessica Simpson, Criis Neal, Isaiah Akomeah, Tonya Spencer, plus one Amirah). Also worth noting: Lanham had a $279 membership refund plus $150 cancellation, and Lanham package expiry $6,988 was the heaviest single-week in the 15-week series.',
+    loc:{
+      lanham:{tv:17417,rev:9526,prod:79.8,rb:71.9,nc:5,neft:'4/$1,196',neftC:4,neftV:1196,reft:5541,mcan:428,ret:371,tkt:161,onl:14.9,ug:61,disc:3091,pr:9.8,invC:94,rebC:41,revCats:[9526,6737,980,371],svc:{'Stretch @ The Loft':54,'New Client Stretch':5,'Enhancements':2,'Massage @ The Loft':1},bsrc:{'Zenoti':53,'Online':5,'MyZen':2,'Zenoti-Mobile':1,'Voice':1},ml:{open:54817,sold:6737,red:3533,can:428,close:57593},pl:{open:52442,sold:980,red:2493,exp:6988,close:43940}},
+      bethesda:{tv:8047,rev:3291,prod:55.2,rb:66.7,nc:2,neft:'8/$2,392',neftC:8,neftV:2392,reft:1972,mcan:0,ret:138,tkt:157,onl:4.7,ug:25,disc:984,pr:14.3,invC:43,rebC:14,revCats:[3291,4364,1080,138],svc:{'Stretch @ The Loft':26,'New Client Stretch':2},bsrc:{'Zenoti':22,'Zenoti-Mobile':4,'Voice':1,'Online':1},ml:{open:34702,sold:4364,red:2137,can:0,close:36928},pl:{open:24974,sold:1620,red:180,exp:1620,close:24794}},
+    },
+    memberships:[
+      {n:'Jessica Simpson',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 5',val:299},
+      {n:'Darius Moore',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 5',val:299},
+      {n:'Darlene Slaughter',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 5',val:299},
+      {n:'Emma Gbedemah',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 5',val:299},
+      {n:'Criis Neal',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 5',val:299},
+      {n:'Matilda Rial',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 4',val:299},
+      {n:'Danielle McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 4',val:299},
+      {n:'Breanna Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 4',val:279},
+      {n:'Sean Cook',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 3',val:299},
+      {n:'Douglas Vereen',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 3',val:279},
+      {n:'Kiristin Reid',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 3',val:299},
+      {n:'Michelle Stevenson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 3',val:299},
+      {n:'Chris Howard',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 3',val:299},
+      {n:'Isaiah Akomeah',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 3',val:299},
+      {n:'Brenda Fleming',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 2',val:279},
+      {n:'Tobey Royal',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 1',val:259},
+      {n:'Evangela Brown',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 1',val:279},
+      {n:'Marcus Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 1',val:279},
+      {n:'Michele Johnson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 1',val:279},
+      {n:'Sacoyia Todd',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 1',val:299},
+      {n:'Dana Sanders',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 1',val:299},
+      {n:'Baron Walden',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 1',val:299},
+      {n:'Dana Collins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 1',val:299},
+      {n:'Jen Casey',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 30',val:299},
+      {n:'Marvin Wilson',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 30',val:279},
+      {n:'Grace Mayberry',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 30',val:279},
+      {n:'AVION SOBERS',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 30',val:279},
+      {n:'Brian Baylor',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 30',val:299},
+      {n:'Weddy Youn',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 30',val:299},
+      {n:'Brittny Drayton',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 30',val:299},
+      {n:'Amirah McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 30',val:299},
+      {n:'Tonya Spencer',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 30',val:299},
+      {n:'Amirah McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 30',val:299},
+      {n:'Amirah McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 30',val:299},
+      {n:'Amirah McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'new',date:'Jun 30',val:299},
+      {n:'Vivian Carter',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 29',val:299},
+      {n:'Datrell Ward',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jun 29',val:299},
+      {n:'Kevin Jacobs',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jun 29',val:258},
+    ],
+  },
+  w16: {
+    label:'Jul 6 – 12, 2026', shortLabel:'Jul 6–12', totalValC: 20032,
+    alert:'🎯 <strong>Short holiday week, mixed signals:</strong> $20,032 (–$5,432 vs prior) — but the story is more nuanced than the total suggests. <strong>Lanham was massively short-staffed</strong> — only 58.5 provider-hours available vs typical ~137 — producing a <strong>103.8% utilization</strong> (booked hours exceeded staffed hours). Service rev/hour actually strong at $160/hr. <strong>NSR recovery at Lanham:</strong> new clients jumped 5 → 20 (+300%), 6 true first-visits vs w15\'s 1. <strong>But Bethesda still weak:</strong> only 1 NSR, and zero new EFT sales (first Bethesda zero-new-EFT since w9). Only 1 new EFT combined (Barbara Bazron at Lanham). <strong>Watch:</strong> Lanham $2,930 in ML cancellations — largest since w8. Was Jul 6–12 a real short week (staff PTO around Jul 4), or a scheduling gap that needs backfilling?',
+    loc:{
+      lanham:{tv:13901,rev:9366,prod:103.8,rb:64.8,nc:20,neft:'1/$299',neftC:1,neftV:299,reft:2860,mcan:2930,ret:410,tkt:167,onl:4.7,ug:65,disc:2895,pr:5.3,invC:86,rebC:35,revCats:[9366,3159,540,410],svc:{'Stretch @ The Loft':45,'New Client Stretch':20,'Premium':3,'Massage @ The Loft':1,'Enhancements':1},bsrc:{'Zenoti':63,'Online':3,'Voice':2,'Bot':1,'MyZen':1},ml:{open:57593,sold:3159,red:3612,can:2930,close:54210},pl:{open:44447,sold:1080,red:2307,exp:2700,close:40520}},
+      bethesda:{tv:6131,rev:3374,prod:49.4,rb:52.4,nc:1,neft:'0/$0',neftC:0,neftV:0,reft:2861,mcan:0,ret:140,tkt:153,onl:5.9,ug:20,disc:1146,pr:19.1,invC:34,rebC:11,revCats:[3374,2861,0,140],svc:{'Stretch @ The Loft':11,'New Client Stretch':1},bsrc:{'Zenoti':7,'MyZen':2,'Zenoti-Mobile':2,'Online':1},ml:{open:36928,sold:2582,red:2387,can:0,close:37124},pl:{open:24794,sold:0,red:360,exp:0,close:24434}},
+    },
+    memberships:[
+      {n:'Tovah May',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 12',val:279},
+      {n:'Dana Plummer',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 12',val:229},
+      {n:'Crystal Smith',loc:'Bethesda',plan:'OLD 2- 30 min stretch visits',type:'rec',date:'Jul 12',val:209},
+      {n:'Sandra Wright',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 12',val:299},
+      {n:'Barbara Bazron',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 12',val:299},
+      {n:'Joseph Swann',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 11',val:299},
+      {n:'Valencia Bush',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 11',val:299},
+      {n:'LIsa Watkins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 11',val:299},
+      {n:'Toniere Lee',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 10',val:279},
+      {n:'Mukul Nerurkar',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 10',val:299},
+      {n:'Shereada Clarke',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 8',val:279},
+      {n:'Marcia Collins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 8',val:299},
+      {n:'Shereada Clarke',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 8',val:279},
+      {n:'T.Pope Pope',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 8',val:299},
+      {n:'Stacey Dixon',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 7',val:279},
+      {n:'Monica Hayes',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 7',val:299},
+      {n:'Kerry Ann Nakouye',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 7',val:299},
+      {n:'Candice Thompson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 7',val:299},
+      {n:'Quinci Moody',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 6',val:279},
+      {n:'Ashley Duncan',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 6',val:299},
+      {n:'Ogi Oseji',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 6',val:320},
+    ],
+  },
+  w17: {
+    label:'Jul 13 – 19, 2026', shortLabel:'Jul 13–19', totalValC: 20223,
+    alert:'📆 <strong>Jul 13 – 19 (backfilled from Jul 13–Aug 9 aggregate):</strong> $20,223 total value. Combined NSR new clients: 9 (Lanham 5, Bethesda 4). New EFT: 2/$598. Recurring EFT: $5,990. NSR started softer at 9 combined — bookings volume Lanham 60/Bethesda 17. <em>⚠ From 4-week aggregate:</em> NSR count, memberships, invoice count, and svc/bsrc mix are exact per week. Total value, service revenue, retail, and discount are proportionally allocated by weekly invoice count. Productivity, rebook %, online %, avg ticket use the 4-week period average (identical for w17–w20). Liability movements distributed proportionally.',
+    loc:{
+      lanham:{tv:15588,rev:9356,prod:81.3,rb:49.6,nc:5,neft:'2/$598',neftC:2,neftV:598,reft:4575,mcan:0,ret:196,tkt:165,onl:14.0,disc:2927,pr:16.4,invC:60,rebC:27,revCats:[9356,5173,1132,196],svc:{'Stretch @ The Loft':48,'New Client Stretch':5,'Massage @ The Loft':2,'Dr Akmal':2,'Enhancements':2,'Premium':1},bsrc:{'Zenoti':50,'Zenoti-Mobile':5,'Online':3,'MyZen':1,'Voice':1},ml:{open:54210,sold:4533,red:3781,can:0,close:54962},pl:{open:43890,sold:1253,red:1792,exp:1948,close:41403}},
+      bethesda:{tv:4635,rev:2505,prod:57.6,rb:60.6,nc:4,neft:'0/$0',neftC:0,neftV:0,reft:1415,mcan:0,ret:75,tkt:154,onl:17.7,disc:859,pr:27.3,invC:17,rebC:10,revCats:[2505,1415,262,75],svc:{'Stretch @ The Loft':13,'New Client Stretch':4},bsrc:{'Zenoti':10,'Zenoti-Mobile':3,'MyZen':2,'Online':1,'Voice':1},ml:{open:37403,sold:1626,red:1768,can:0,close:37261},pl:{open:24434,sold:262,red:393,exp:492,close:23811}},
+    },
+    memberships:[
+      {n:'Pamela Hardnett',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 19',val:299},
+      {n:'Steve Walker',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 19',val:260},
+      {n:'Finda Millimouno',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 18',val:299},
+      {n:'Doris Cook',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 18',val:279},
+      {n:'Marva Parker',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 17',val:279},
+      {n:'Raykyle Highsmith',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 17',val:320},
+      {n:'Velesha Burke',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'new',date:'Jul 16',val:299},
+      {n:'Cheronda Albury',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 16',val:299},
+      {n:'James Peay',loc:'Bethesda',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Jul 16',val:499},
+      {n:'Collene Wilson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 15',val:299},
+      {n:'LeRoy Dock',loc:'Bethesda',plan:'OLD 4 - 30 minute stretch vis',type:'rec',date:'Jul 15',val:297},
+      {n:'Anthony Webb',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 15',val:299},
+      {n:'Christopher Coyne',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 14',val:299},
+      {n:'Marlen Giles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 14',val:299},
+      {n:'Crystal Eubanks',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 14',val:279},
+      {n:'Ronald Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 14',val:279},
+      {n:'Vianka Hardy',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 14',val:279},
+      {n:'Jamal Blackwell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 14',val:249},
+      {n:'Candyce Jones',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 13',val:299},
+      {n:'Natalia Zackery',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 13',val:299},
+      {n:'Matthew Johnson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 13',val:299},
+      {n:'Keely Walston',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 13',val:279}
+    ],
+  },
+  w18: {
+    label:'Jul 20 – 26, 2026', shortLabel:'Jul 20–26', totalValC: 24939,
+    alert:'📆 <strong>Jul 20 – 26 (backfilled from Jul 13–Aug 9 aggregate):</strong> $24,939 total value. Combined NSR new clients: 11 (Lanham 10, Bethesda 1). New EFT: 1/$329. Recurring EFT: $5,511. NSR ticked up to 11 combined. Highest single-week appt volume in the gap (Lanham 75). <em>⚠ From 4-week aggregate:</em> NSR count, memberships, invoice count, and svc/bsrc mix are exact per week. Total value, service revenue, retail, and discount are proportionally allocated by weekly invoice count. Productivity, rebook %, online %, avg ticket use the 4-week period average (identical for w17–w20). Liability movements distributed proportionally.',
+    loc:{
+      lanham:{tv:19486,rev:11695,prod:81.3,rb:49.6,nc:10,neft:'1/$329',neftC:1,neftV:329,reft:4016,mcan:0,ret:245,tkt:165,onl:14.0,disc:3659,pr:16.4,invC:75,rebC:34,revCats:[11695,4345,1415,245],svc:{'Stretch @ The Loft':54,'New Client Stretch':10,'Premium':4,'Dr Akmal':3,'Enhancements':2,'Ben The Baptist':1,'Massage @ The Loft':1},bsrc:{'Zenoti':63,'Online':5,'MyZen':3,'Voice':3,'Zenoti-Mobile':1},ml:{open:54962,sold:5666,red:4726,can:0,close:55902},pl:{open:41403,sold:1566,red:2240,exp:2435,close:38294}},
+      bethesda:{tv:5453,rev:2947,prod:57.6,rb:60.6,nc:1,neft:'0/$0',neftC:0,neftV:0,reft:1495,mcan:0,ret:89,tkt:154,onl:17.7,disc:1011,pr:27.3,invC:20,rebC:11,revCats:[2947,1495,309,89],svc:{'Stretch @ The Loft':19,'New Client Stretch':1},bsrc:{'Zenoti':14,'MyZen':3,'Online':2,'Voice':1},ml:{open:37261,sold:1913,red:2080,can:0,close:37094},pl:{open:23811,sold:309,red:463,exp:579,close:23078}},
+    },
+    memberships:[
+      {n:'Ebony Ford',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 26',val:299},
+      {n:'Heather Walker',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 26',val:299},
+      {n:'Dominique Pender',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 26',val:279},
+      {n:'Chanza Baytop',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 26',val:299},
+      {n:'Nytisha Finger',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 25',val:299},
+      {n:'Ashlee Brown',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 25',val:299},
+      {n:'Erika Washington',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 25',val:279},
+      {n:'Kelly Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 24',val:249},
+      {n:'Semia Hackett',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 23',val:279},
+      {n:'Angela Woods',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 23',val:279},
+      {n:'Joy Oyedele',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 22',val:299},
+      {n:'Bryanna Gross',loc:'Lanham',plan:'PARTNER FLEX',type:'new',date:'Jul 22',val:329},
+      {n:'Natash Jones',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 22',val:299},
+      {n:'Kayla Friedland',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 21',val:299},
+      {n:'Tenilla Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 21',val:279},
+      {n:'Justyce Watson',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 20',val:299},
+      {n:'Eva Mutunga',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 20',val:299},
+      {n:'Dena Robinson',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 20',val:299},
+      {n:'D\'Andre Charles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 20',val:299},
+      {n:'Marcel Chesson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 20',val:279}
+    ],
+  },
+  w19: {
+    label:'Jul 27 – Aug 2, 2026', shortLabel:'Jul 27–Aug 2', totalValC: 20926,
+    alert:'📆 <strong>Jul 27 – Aug 2 (backfilled from Jul 13–Aug 9 aggregate):</strong> $20,926 total value. Combined NSR new clients: 19 (Lanham 16, Bethesda 3). New EFT: 3/$1,027. Recurring EFT: $8,049. NSR peaked at 19 (Lanham 16, best of the gap). But Bethesda dipped to 11 appts total. <em>⚠ From 4-week aggregate:</em> NSR count, memberships, invoice count, and svc/bsrc mix are exact per week. Total value, service revenue, retail, and discount are proportionally allocated by weekly invoice count. Productivity, rebook %, online %, avg ticket use the 4-week period average (identical for w17–w20). Liability movements distributed proportionally.',
+    loc:{
+      lanham:{tv:17927,rev:10760,prod:81.3,rb:49.6,nc:16,neft:'3/$1,027',neftC:3,neftV:1027,reft:5182,mcan:0,ret:225,tkt:165,onl:14.0,disc:3366,pr:16.4,invC:69,rebC:31,revCats:[10760,6209,1302,225],svc:{'Stretch @ The Loft':39,'New Client Stretch':16,'Premium':5,'Dr Akmal':5,'Enhancements':2,'Massage @ The Loft':1,'Ben The Baptist':1},bsrc:{'Zenoti':54,'Online':12,'Voice':2,'MyZen':1},ml:{open:55902,sold:5213,red:4348,can:0,close:56767},pl:{open:38294,sold:1441,red:2061,exp:2240,close:35434}},
+      bethesda:{tv:2999,rev:1621,prod:57.6,rb:60.6,nc:3,neft:'0/$0',neftC:0,neftV:0,reft:2867,mcan:0,ret:49,tkt:154,onl:17.7,disc:556,pr:27.3,invC:11,rebC:6,revCats:[1621,2867,170,49],svc:{'Stretch @ The Loft':8,'New Client Stretch':3},bsrc:{'Zenoti':6,'Online':3,'Zenoti-Mobile':1,'Voice':1},ml:{open:37094,sold:1052,red:1144,can:0,close:37002},pl:{open:23078,sold:170,red:255,exp:318,close:22675}},
+    },
+    memberships:[
+      {n:'Brenda Fleming',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 2',val:279},
+      {n:'Donald Taylor',loc:'Lanham',plan:'PARTNER FLEX_Setup fee',type:'rec',date:'Aug 1',val:29},
+      {n:'Donald Taylor',loc:'Lanham',plan:'PARTNER FLEX',type:'new',date:'Aug 1',val:329},
+      {n:'Alana Scott',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'new',date:'Aug 1',val:349},
+      {n:'Dana Sanders',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 1',val:299},
+      {n:'Dana Collins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 1',val:299},
+      {n:'Michele Johnson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 1',val:279},
+      {n:'Marcus Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 1',val:279},
+      {n:'Tobey Royal',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 1',val:259},
+      {n:'Jaclyn Johnson',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'new',date:'Aug 1',val:349},
+      {n:'Weddy Youn',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 30',val:299},
+      {n:'Marvin Wilson',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 30',val:279},
+      {n:'Grace Mayberry',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 30',val:279},
+      {n:'AVION SOBERS',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 30',val:279},
+      {n:'Brian Baylor',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 30',val:299},
+      {n:'Jen Casey',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 30',val:299},
+      {n:'Tonya + Amirah Spencer + Mccoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 30',val:299},
+      {n:'Tonya + Amirah Spencer + Mccoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 30',val:299},
+      {n:'Tonya + Amirah Spencer + Mccoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 30',val:299},
+      {n:'Brittny Drayton',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 30',val:299},
+      {n:'Vivian Carter',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 29',val:299},
+      {n:'Datrell Ward',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 29',val:299},
+      {n:'Kevin Jacobs',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 29',val:258},
+      {n:'Ashley Walter',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 28',val:279},
+      {n:'Mercedes White',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 28',val:279},
+      {n:'Zoe Foster',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 28',val:279},
+      {n:'Roman Smith',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 28',val:279},
+      {n:'Kevin Jackson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 27',val:299},
+      {n:'Aaron Dixon',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Jul 27',val:299},
+      {n:'Jimmy Jimmy Sanders',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 27',val:279},
+      {n:'Kandace Latson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Jul 27',val:279},
+      {n:'Sean Wilson',loc:'Bethesda',plan:'OLD 4 - 30 minute stretch vis',type:'rec',date:'Jul 27',val:297}
+    ],
+  },
+  w20: {
+    label:'Aug 3 – 9, 2026', shortLabel:'Aug 3–9', totalValC: 22886,
+    alert:'📆 <strong>Aug 3 – 9 (backfilled from Jul 13–Aug 9 aggregate):</strong> $22,886 total value. Combined NSR new clients: 14 (Lanham 10, Bethesda 4). New EFT: 3/$1,027. Recurring EFT: $5,682. Appt volume held with Bethesda recovery (22 appts, biggest since w15). NSR 14 combined. <em>⚠ From 4-week aggregate:</em> NSR count, memberships, invoice count, and svc/bsrc mix are exact per week. Total value, service revenue, retail, and discount are proportionally allocated by weekly invoice count. Productivity, rebook %, online %, avg ticket use the 4-week period average (identical for w17–w20). Liability movements distributed proportionally.',
+    loc:{
+      lanham:{tv:16888,rev:10136,prod:81.3,rb:49.6,nc:10,neft:'3/$1,027',neftC:3,neftV:1027,reft:3867,mcan:0,ret:212,tkt:165,onl:14.0,disc:3171,pr:16.4,invC:65,rebC:29,revCats:[10136,4894,1227,212],svc:{'Stretch @ The Loft':48,'New Client Stretch':10,'Premium':4,'Massage @ The Loft':1,'Enhancements':1,'Dr Akmal':1},bsrc:{'Zenoti':47,'Online':12,'Zenoti-Mobile':3,'MyZen':3},ml:{open:56767,sold:4911,red:4096,can:0,close:57582},pl:{open:35434,sold:1357,red:1941,exp:2110,close:32740}},
+      bethesda:{tv:5998,rev:3242,prod:57.6,rb:60.6,nc:4,neft:'0/$0',neftC:0,neftV:0,reft:1815,mcan:0,ret:98,tkt:154,onl:17.7,disc:1112,pr:27.3,invC:22,rebC:13,revCats:[3242,1815,339,98],svc:{'Stretch @ The Loft':18,'New Client Stretch':4},bsrc:{'MyZen':11,'Zenoti':7,'Online':4},ml:{open:37002,sold:2104,red:2288,can:0,close:36818},pl:{open:22675,sold:339,red:509,exp:637,close:21868}},
+    },
+    memberships:[
+      {n:'Erica Patterson',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'new',date:'Aug 8',val:349},
+      {n:'T.Pope Pope',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 8',val:299},
+      {n:'Marcia Collins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 8',val:299},
+      {n:'Bouyea Amen El',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'new',date:'Aug 7',val:349},
+      {n:'Candice Thompson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 7',val:299},
+      {n:'Kerry Ann Nakouye',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 7',val:299},
+      {n:'Monica Hayes',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 7',val:299},
+      {n:'Sacoyia Todd',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 7',val:299},
+      {n:'Ogi Oseji',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 6',val:320},
+      {n:'Darius Moore',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 5',val:299},
+      {n:'Emma Gbedemah',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 5',val:299},
+      {n:'Darlene Slaughter',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 5',val:299},
+      {n:'Criis Neal',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 5',val:299},
+      {n:'Ramona Oliver',loc:'Lanham',plan:'PARTNER FLEX',type:'new',date:'Aug 5',val:329},
+      {n:'Ramona Oliver',loc:'Lanham',plan:'PARTNER FLEX_Setup fee',type:'rec',date:'Aug 5',val:29},
+      {n:'Matilda Rial',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 4',val:299},
+      {n:'Danielle McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 4',val:299},
+      {n:'Breanna Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 4',val:279},
+      {n:'Isaiah Akomeah',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 3',val:299},
+      {n:'Michelle Stevenson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 3',val:299},
+      {n:'Chris Howard',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 3',val:299},
+      {n:'Sean Cook',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 3',val:299},
+      {n:'Kiristin Reid',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 3',val:299}
+    ],
+  },
+  w21: {
+    label:'Aug 10 – 16, 2026', shortLabel:'Aug 10–16', totalValC: 17779,
+    alert:'📊 <strong>Gap now filled — w17-w20 backfilled from aggregate:</strong> Standalone this week: $17,779 total (low); Lanham 8 NSR + Bethesda 5 NSR = 13 total; Lanham productivity 52.2% (low), Bethesda 63.6% (strong). <strong>PARTNER FLEX plan continues:</strong> KENA SPENCER (Lanham) and Carla Pickering (Bethesda), both $329 + $29 setup fee (this plan first appeared in the w17-w20 backfilled data too — see w19 for Kelly Denard, Damali Osei). <strong>Watch:</strong> Zero package sales at both centers this week (only week in the visible series with this pattern). Bethesda rebook collapsed to 27.3%. Continuity vs w20 close is now clean.',
+    loc:{
+      lanham:{tv:12670,rev:7256,prod:52.2,rb:45.5,nc:8,neft:'1/$329',neftC:1,neftV:329,reft:4863,mcan:558,ret:94,tkt:165,onl:21.6,ug:53,disc:1951,pr:23.5,invC:74,rebC:20,revCats:[7256,5192,0,94],svc:{'Stretch @ The Loft':44,'New Client Stretch':8,'Massage @ The Loft':2,'Enhancements':2},bsrc:{'Zenoti':49,'Online':6,'Zenoti-Mobile':1},ml:{open:57581,sold:4893,red:2726,can:558,close:59190},pl:{open:32738,sold:0,red:592,exp:3060,close:29085}},
+      bethesda:{tv:5109,rev:1682,prod:63.6,rb:27.3,nc:5,neft:'1/$329',neftC:1,neftV:329,reft:2501,mcan:0,ret:114,tkt:129,onl:41.4,ug:15,disc:437,pr:36.4,invC:29,rebC:3,revCats:[1682,2830,0,114],svc:{'Stretch @ The Loft':8,'New Client Stretch':5},bsrc:{'Zenoti':7,'Online':5,'MyZen':1},ml:{open:36818,sold:2830,red:1274,can:0,close:38374},pl:{open:21867,sold:0,red:0,exp:640,close:21227}},
+    },
+    memberships:[
+      {n:'Cheronda Albury',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 16',val:299},
+      {n:'James Peay',loc:'Bethesda',plan:'Stay Flexy 4 (50 min)',type:'rec',date:'Aug 16',val:499},
+      {n:'Carla Pickering',loc:'Bethesda',plan:'PARTNER FLEX_Setup fee',type:'rec',date:'Aug 15',val:29},
+      {n:'Carla Pickering',loc:'Bethesda',plan:'PARTNER FLEX',type:'new',date:'Aug 15',val:329},
+      {n:'Anthony Webb',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 15',val:299},
+      {n:'Collene Wilson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 15',val:299},
+      {n:'LeRoy Dock',loc:'Bethesda',plan:'OLD 4 - 30 minute stretch vis',type:'rec',date:'Aug 15',val:297},
+      {n:'Christopher Coyne',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 14',val:299},
+      {n:'Marlen Giles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 14',val:299},
+      {n:'Crystal Eubanks',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 14',val:279},
+      {n:'Ronald Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 14',val:279},
+      {n:'Vianka Hardy',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 14',val:279},
+      {n:'Raykyle Highsmith',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 14',val:320},
+      {n:'Jamal Blackwell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 14',val:249},
+      {n:'Keely Walston',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 13',val:279},
+      {n:'Natalia Zackery',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 13',val:299},
+      {n:'Matthew Johnson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 13',val:299},
+      {n:'KENA SPENCER',loc:'Lanham',plan:'PARTNER FLEX_Setup fee',type:'rec',date:'Aug 12',val:29},
+      {n:'KENA SPENCER',loc:'Lanham',plan:'PARTNER FLEX',type:'new',date:'Aug 12',val:329},
+      {n:'Tovah May',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 12',val:279},
+      {n:'Sandra Wright',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 12',val:299},
+      {n:'Crystal Smith',loc:'Bethesda',plan:'OLD 2- 30 min stretch visits',type:'rec',date:'Aug 12',val:209},
+      {n:'Dana Plummer',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 12',val:229},
+      {n:'Baron Walden',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 11',val:299},
+      {n:'LIsa Watkins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 11',val:299},
+      {n:'Valencia Bush',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 11',val:299},
+      {n:'Joseph Swann',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 11',val:299},
+      {n:'Mukul Nerurkar',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 10',val:299},
+      {n:'Toniere Lee',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 10',val:279},
+    ],
+  },
+  w22: {
+    label:'Aug 17 – 23, 2026', shortLabel:'Aug 17–23', totalValC: 13885,
+    alert:'📉 <strong>Volume continues to compress:</strong> $13,885 (–$3,894 vs prior). Fourth consecutive week of declining total value ($22,886 → $17,779 → $13,885). <strong>New clients (broad definition): 17 combined (Lanham 15, Bethesda 2)</strong> — 6 NSR bookings joined by first appearance of <strong>88 New Client Experience</strong> (11 bookings, all Lanham). <strong>New plan tier surfaces:</strong> "LIFESTYLE FLEX" at $349 — Donald Taylor (Lanham) is the first customer. This joins the PARTNER FLEX ($329) launched in July, suggesting an active plan-tier expansion effort. <strong>Bethesda quietly strong on the existing book:</strong> productivity 70.5% (highest since w13\'s 64%), rebook 64.3%. <strong>Watch:</strong> Only 1 new EFT signup all week combined. Continuity is perfect on all 4 balances — the numbers are clean, the volume is just genuinely low.',
+    loc:{
+      lanham:{tv:10519,rev:6199,prod:56.8,rb:48.8,nc:15,neft:'1/$349',neftC:1,neftV:349,reft:3449,mcan:499,ret:25,tkt:151,onl:21.2,ug:51,disc:2448,pr:9.8,invC:66,rebC:20,revCats:[6199,3798,640,25],svc:{'Stretch @ The Loft':43,'New Client Stretch':15,'Premium':2,'Ben The Baptist':1,'Dr Akmal':1},bsrc:{'Zenoti':49,'Online':10,'Voice':2,'MyZen':1},ml:{open:59190,sold:3200,red:3548,can:499,close:58343},pl:{open:29085,sold:640,red:770,exp:720,close:28236}},
+      bethesda:{tv:3366,rev:2128,prod:70.5,rb:64.3,nc:2,neft:'0/$0',neftC:0,neftV:0,reft:1495,mcan:0,ret:8,tkt:152,onl:15.8,ug:15,disc:724,pr:14.3,invC:19,rebC:9,revCats:[2128,1495,0,8],svc:{'Stretch @ The Loft':11,'New Client Stretch':2},bsrc:{'Zenoti':13},ml:{open:38374,sold:1196,red:1750,can:0,close:37820},pl:{open:21227,sold:0,red:540,exp:0,close:20687}},
+    },
+    memberships:[
+      {n:'Semia Hackett',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 23',val:279},
+      {n:'Angela Woods',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 23',val:279},
+      {n:'Joy Oyedele',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 22',val:299},
+      {n:'Natash Jones',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 22',val:299},
+      {n:'Donald Taylor',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'new',date:'Aug 21',val:349},
+      {n:'Kayla Friedland',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 21',val:299},
+      {n:'Tenilla Jones',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 21',val:279},
+      {n:'D\'Andre Charles',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 20',val:299},
+      {n:'Dena Robinson',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 20',val:299},
+      {n:'Eva Mutunga',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 20',val:299},
+      {n:'Justyce Watson',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 20',val:299},
+      {n:'Barbara Bazron',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 19',val:299},
+      {n:'Pamela Hardnett',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 19',val:299},
+      {n:'Steve Walker',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 19',val:260},
+      {n:'Velesha Burke',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 18',val:299},
+      {n:'Finda Millimouno',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 18',val:299},
+      {n:'Doris Cook',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 18',val:279},
+      {n:'Marva Parker',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 17',val:279},
+    ],
+  },
+  w23: {
+    label:'Aug 24 – 30, 2026', shortLabel:'Aug 24–30', totalValC: 18419,
+    alert:'📊 <strong>Gap now filled — w23 data received:</strong> $18,419 (+$4,534 vs w22). <strong>New clients (broad): 26 (Lanham 21, Bethesda 5)</strong>. Lanham surge driven by <strong>88 Residency Practitioner Special</strong> — the service debuts this week with 21 bookings, all at Lanham. <strong>Bethesda\'s strongest week of the summer:</strong> 5 NSR new clients (highest since w15), productivity 65.7%, rebook 62.5%. <strong>New EFT:</strong> 2/$678 — Joshua Gray (Lanham LIFESTYLE FLEX $349, Aug 29) and Ira Coats (Bethesda PARTNER FLEX $329, Aug 30). LIFESTYLE FLEX momentum continues (started w22 with Donald Taylor, hits stride in w24). <strong>All 4 continuities perfect</strong> — w22→w23 and w23→w24 both chain exactly. Bethesda finally saw its first PARTNER FLEX customer here — the plan launched in July but hadn\'t landed at Bethesda until now.',
+    loc:{
+      lanham:{tv:13210,rev:6799,prod:56.0,rb:33.9,nc:21,neft:'1/$349',neftC:1,neftV:349,reft:5172,mcan:0,ret:383,tkt:115,onl:20.7,ug:59,disc:2163,pr:13.3,invC:87,rebC:19,revCats:[6799,5521,540,383],svc:{'Stretch @ The Loft':35,'New Client Stretch':21,'Enhancements':3,'Premium':2,'Massage @ The Loft':1},bsrc:{'Zenoti':41,'Zenoti-Mobile':12,'Online':6,'MyZen':2,'Voice':1},ml:{open:58343,sold:5521,red:3396,can:0,close:60468},pl:{open:28236,sold:540,red:147,exp:1493,close:27136}},
+      bethesda:{tv:5209,rev:2579,prod:65.7,rb:62.5,nc:5,neft:'1/$329',neftC:1,neftV:329,reft:1412,mcan:0,ret:26,tkt:161,onl:25.9,ug:16,disc:625,pr:25.0,invC:27,rebC:10,revCats:[2579,1741,1020,26],svc:{'Stretch @ The Loft':14,'New Client Stretch':6},bsrc:{'Zenoti':17,'Online':3},ml:{open:37820,sold:1444,red:1644,can:0,close:37619},pl:{open:20687,sold:1020,red:180,exp:360,close:21167}},
+    },
+    memberships:[
+      {n:'Ira Coats',loc:'Bethesda',plan:'PARTNER FLEX',type:'new',date:'Aug 30',val:329},
+      {n:'Brian Baylor',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 30',val:299},
+      {n:'AVION SOBERS',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 30',val:279},
+      {n:'Grace Mayberry',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 30',val:279},
+      {n:'Marvin Wilson',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 30',val:279},
+      {n:'Brittny Drayton',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 30',val:299},
+      {n:'Joshua Gray',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'new',date:'Aug 29',val:349},
+      {n:'Vivian Carter',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 29',val:299},
+      {n:'Datrell Ward',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 29',val:299},
+      {n:'Kevin Jacobs',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 29',val:258},
+      {n:'Ashley Walter',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 28',val:279},
+      {n:'Mercedes White',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 28',val:279},
+      {n:'Roman Smith',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 28',val:279},
+      {n:'Kevin Jackson',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 27',val:299},
+      {n:'Aaron Dixon',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 27',val:299},
+      {n:'Jimmy Jimmy Sanders',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 27',val:279},
+      {n:'Kandace Latson',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 27',val:279},
+      {n:'Sean Wilson',loc:'Bethesda',plan:'OLD 4 - 30 min stretch',type:'rec',date:'Aug 27',val:297},
+      {n:'Ebony Ford',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 26',val:299},
+      {n:'Chanza Baytop',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 26',val:299},
+      {n:'Heather Walker',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 26',val:299},
+      {n:'Dominique Pender',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 26',val:279},
+      {n:'Ashlee Brown',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Aug 25',val:299},
+      {n:'Erika Washington',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 25',val:279},
+      {n:'Kelly Taylor',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Aug 24',val:249},
+    ],
+  },
+  w24: {
+    label:'Aug 31 – Sep 6, 2026', shortLabel:'Aug 31–Sep 6', totalValC: 15929,
+    alert:'🆕 <strong>New plan tier — FAMILY FLEX at $599:</strong> Kevin Bright (Lanham, Sep 6) is the first customer. LIFESTYLE FLEX ($349) also had 5 transactions this week (3 new: Kiana Myles, Lelia Mejia, Claudia Chavez; 2 recurring: Jaclyn Johnson, Alana Scott). The tiered pricing strategy is clearly gaining traction. Combined new EFT: 4/$1,646 ($599 + 3×$349). <strong>New clients (broad): 24 (Lanham 20, Bethesda 4)</strong> — includes 17 88 Residency Practitioner Special bookings (16 Lanham, 1 Bethesda) plus 7 traditional NSR. 2 true first-visits at Lanham. <strong>Watch:</strong> Lanham productivity 30.8% (lowest since April w4 range) — but volume drop is Bethesda-heavy this week (20 invoices vs 30-40 typical). Lanham PL expiry $7,260 — <strong>new series high</strong>, exceeding w15\'s $6,988. Continuity vs w23 close is now perfect on all 4 balances.',
+    loc:{
+      lanham:{tv:13012,rev:7227,prod:30.8,rb:48.9,nc:20,neft:'3/$1,297',neftC:3,neftV:1297,reft:3977,mcan:976,ret:449,tkt:147,onl:21.5,ug:55,disc:1981,pr:22.0,invC:79,rebC:23,revCats:[7227,5274,0,449],svc:{'Stretch @ The Loft':48,'New Client Stretch':22,'Enhancements':2,'Premium':2,'Massage @ The Loft':1,'Ben The Baptist':1},bsrc:{'Zenoti':58,'Online':11,'Zenoti-Mobile':4,'MyZen':3},ml:{open:60468,sold:4975,red:3368,can:976,close:61098},pl:{open:27136,sold:499,red:305,exp:7260,close:20070}},
+      bethesda:{tv:2917,rev:1195,prod:30.8,rb:62.5,nc:4,neft:'1/$349',neftC:1,neftV:349,reft:1156,mcan:0,ret:7,tkt:120,onl:35.0,ug:12,disc:402,pr:22.2,invC:20,rebC:5,revCats:[1195,1505,0,7],svc:{'Stretch @ The Loft':8,'New Client Stretch':4,'Enhancements':1},bsrc:{'Zenoti':5,'Online':4,'MyZen':3,'SmartKartWebstore':1},ml:{open:37619,sold:1505,red:1974,can:0,close:37150},pl:{open:21167,sold:0,red:0,exp:439,close:20728}},
+    },
+    memberships:[
+      {n:'Kevin Bright',loc:'Lanham',plan:'FAMILY FLEX',type:'new',date:'Sep 6',val:599},
+      {n:'Kiana Myles',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'new',date:'Sep 5',val:349},
+      {n:'Ramona Oliver',loc:'Lanham',plan:'PARTNER FLEX',type:'rec',date:'Sep 5',val:329},
+      {n:'Criis Neal',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 5',val:299},
+      {n:'Darius Moore',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 5',val:299},
+      {n:'Darlene Slaughter',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 5',val:299},
+      {n:'Claudia Chavez',loc:'Bethesda',plan:'LIFESTYLE FLEX',type:'new',date:'Sep 4',val:349},
+      {n:'Matilda Rial',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 4',val:299},
+      {n:'Danielle McCoy',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 4',val:299},
+      {n:'Staci Burrough',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 3',val:299},
+      {n:'Kiristin Reid',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 3',val:299},
+      {n:'Isaiah Akomeah',loc:'Bethesda',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 3',val:299},
+      {n:'Staci Burrough',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 2',val:299},
+      {n:'Lelia Mejia',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'new',date:'Sep 2',val:349},
+      {n:'Brenda Fleming',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Sep 2',val:279},
+      {n:'Marcus Mitchell',loc:'Lanham',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Sep 1',val:279},
+      {n:'Dana Sanders',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 1',val:299},
+      {n:'Dana Collins',loc:'Lanham',plan:'NEW Flex 2x/Month',type:'rec',date:'Sep 1',val:299},
+      {n:'Jaclyn Johnson',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'rec',date:'Sep 1',val:349},
+      {n:'Alana Scott',loc:'Lanham',plan:'LIFESTYLE FLEX',type:'rec',date:'Sep 1',val:349},
+      {n:'Tobey Royal',loc:'Bethesda',plan:'Stretch Flex 2 (50 min)',type:'rec',date:'Sep 1',val:259},
+    ],
+  },
+};
+
+// ── MONTHLY ROLLUPS ─────────────────────────────────────────────────────────
+const MONTHLY = {
+  june2026: {
+    label: 'June 2026', weeks: ['w11','w12','w13','w14'],
+    note: 'Full June weeks: Jun 1–28 (4 complete weeks)',
+    loc: {
+      lanham: {
+        tv:87462, rev:54485, pkg:6668, ret:1794, disc:13437,
+        nc:102, neftC:20, neftV:5960, reft:16807, mcan:2790,
+        ug:393, invC:557, prod:76.8, rb:49.9, onl:23.4, tkt:153, pr:20.8,
+        memOpen:54055, memSold:18885, memRed:15145, memCan:2790, memClose:54817,
+        pkgOpen:61793, pkgSold:16148, pkgRed:13048, pkgExp:11672, pkgClose:52442,
+        revCats:[54485,22767,6668,1794],
+      },
+      bethesda: {
+        tv:22062, rev:11672, pkg:1620, ret:229, disc:2580,
+        nc:24, neftC:9, neftV:2691, reft:5071, mcan:0,
+        ug:90, invC:133, prod:55.3, rb:69.4, onl:23.7, tkt:150, pr:18.7,
+        memOpen:32962, memSold:7483, memRed:5743, memCan:0, memClose:34702,
+        pkgOpen:27462, pkgSold:1620, pkgRed:1160, pkgExp:2080, pkgClose:24974,
+        revCats:[11672,7762,1620,229],
+      },
+    },
+  },
+  may2026: {
+    label: 'May 2026', weeks: ['w7','w8','w9','w10'],
+    note: 'Full May weeks: May 4–31 (4 complete weeks)',
+    loc: {
+      lanham: {
+        tv:92386, rev:56838, pkg:11863, ret:1569, disc:12560,
+        nc:127, neftC:9, neftV:2691, reft:14660, mcan:2649,
+        ug:446, invC:617, prod:70.1, rb:55.1, onl:32.0, tkt:150, pr:24.6,
+        memOpen:52319, memSold:16195, memRed:12377, memCan:2649, memClose:53477,
+        pkgOpen:65999, pkgSold:17623, pkgRed:12759, pkgExp:8822, pkgClose:61647,
+        revCats:[56838,17351,11863,1569],
+      },
+      bethesda: {
+        tv:18766, rev:9935, pkg:1620, ret:273, disc:1532,
+        nc:27, neftC:5, neftV:1495, reft:4771, mcan:0,
+        ug:76, invC:110, prod:49.0, rb:49.2, onl:35.2, tkt:176, pr:34.1,
+        memOpen:32107, memSold:5668, memRed:4812, memCan:0, memClose:32962,
+        pkgOpen:31414, pkgSold:2800, pkgRed:3095, pkgExp:3117, pkgClose:28002,
+        revCats:[9935,6266,1620,273],
+      },
+    },
+  },
+  april2026: {
+    label: 'April 2026', weeks: ['w3','w4','w5'],
+    note: 'Full April weeks: Apr 6–26 (3 complete weeks)',
+    loc: {
+      lanham: {
+        tv:81374, rev:47011, pkg:16225, ret:1710, disc:8590,
+        nc:114, neftC:13, neftV:3777, reft:12667, mcan:0,
+        ug:386, invC:482, prod:71.0, rb:37.3, onl:28.0, tkt:148, pr:21.2,
+        memOpen:49329, memSold:12667, memRed:8866, memCan:0, memClose:52015,
+        pkgOpen:60054, pkgSold:16225, pkgRed:11737, pkgExp:6051, pkgClose:65367,
+        revCats:[47011,12667,16225,1710],
+      },
+      bethesda: {
+        tv:16039, rev:7164, pkg:4160, ret:263, disc:1538,
+        nc:27, neftC:9, neftV:2522, reft:3638, mcan:0,
+        ug:60, invC:80, prod:51.0, rb:38.8, onl:41.5, tkt:148, pr:36.7,
+        memOpen:31372, memSold:3638, memRed:3084, memCan:0, memClose:31508,
+        pkgOpen:29179, pkgSold:4160, pkgRed:2084, pkgExp:881, pkgClose:32114,
+        revCats:[7164,3638,4160,263],
+      },
+    },
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let currentWeek = 'w24';
+let currentView = 'combined';
+let panelOpen   = false;
+let charts = {};
+
+const navy='#111111', gold='#BBC4CB', blue='#6B7885', green='#27500A', amber='#633806', red='#A32D2D';
+Chart.defaults.font.family="'DM Sans',sans-serif";
+Chart.defaults.font.size=11; Chart.defaults.color='#888888';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+const $  = id => document.getElementById(id);
+const f$ = v  => '$' + Math.round(v).toLocaleString();
+const fp = v  => v.toFixed(1) + '%';
+
+function combined(wk) {
+  const L = wk.loc.lanham, B = wk.loc.bethesda;
+  return {
+    tv:   L.tv   + B.tv,
+    rev:  L.rev  + B.rev,
+    prod: Math.round((L.prod*137.5 + B.prod*40)/177.5 * 10)/10,
+    rb:   Math.round((L.rb + B.rb)/2 * 10)/10,
+    nc:   L.nc   + B.nc,
+    neftC:L.neftC+B.neftC, neftV:L.neftV+B.neftV,
+    reft: L.reft + B.reft,
+    mcan: L.mcan + B.mcan,
+    ret:  L.ret  + B.ret,
+    tkt:  Math.round((L.tkt + B.tkt)/2),
+    onl:  Math.round((L.onl + B.onl)/2 * 10)/10,
+    ug:   L.ug   + B.ug,
+    disc: L.disc + B.disc,
+    pr:   Math.round((L.pr + B.pr)/2 * 10)/10,
+    revCats: L.revCats.map((v,i) => v + B.revCats[i]),
+    svc: mergeObj(L.svc, B.svc),
+    bsrc: mergeObj(L.bsrc, B.bsrc),
+    ml:{ open: L.ml.open+B.ml.open, sold: L.ml.sold+B.ml.sold, red: L.ml.red+B.ml.red, can: L.ml.can+B.ml.can, close: L.ml.close+B.ml.close },
+    pl:{ open: L.pl.open+B.pl.open, sold: L.pl.sold+B.pl.sold, red: L.pl.red+B.pl.red, exp: L.pl.exp+B.pl.exp, close: L.pl.close+B.pl.close },
+  };
+}
+
+function mergeObj(a, b) {
+  const r = {...a};
+  for (const [k,v] of Object.entries(b)) r[k] = (r[k]||0) + v;
+  return r;
+}
+
+function getD(view, wkKey) {
+  const wk = WEEKS[wkKey];
+  if (view === 'combined') return combined(wk);
+  return wk.loc[view];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PANEL
+// ═══════════════════════════════════════════════════════════════════════════
+function togglePanel() {
+  panelOpen = !panelOpen;
+  const panel     = $('sidePanel');
+  const hdrToggle = $('panelToggle');
+  const overlay   = $('panelOverlay');
+  panel.classList.toggle('open', panelOpen);
+  hdrToggle.classList.toggle('open', panelOpen);
+  if (overlay) overlay.style.display = (panelOpen && window.innerWidth <= 600) ? 'block' : 'none';
+  // Resize charts after transition settles
+  setTimeout(() => Object.values(charts).forEach(c => c && c.resize()), 300);
+}
+
+function toggleMonth(el) {
+  el.classList.toggle('closed');
+}
+
+// (Note: the canonical loadWeek() is defined later — it also handles
+// monthly→weekly mode switching. This duplicate has been removed.)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOCATION SWITCHER
+// ═══════════════════════════════════════════════════════════════════════════
+function sv(v) {
+  currentView = v;
+  document.body.className = 'view-' + v;
+  document.querySelectorAll('.sw-btn').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+  $('vLabel').textContent = {lanham:'Lanham', bethesda:'Bethesda', combined:'Combined'}[v];
+  if (currentMode === 'monthly') renderMonthly(currentMonthKey);
+  else renderAll();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+function renderAll() {
+  const wk  = WEEKS[currentWeek];
+  const d   = getD(currentView, currentWeek);
+  const v   = currentView;
+  const isC = v === 'combined';
+
+  // Header
+  $('weekPill').textContent = wk.label;
+  $('ftrWeek').textContent  = 'Week of ' + wk.label;
+
+  // Alert
+  $('alertBar').innerHTML = wk.alert;
+  $('alertBar').style.display = wk.alert ? 'block' : 'none';
+
+  // Hero
+  const heroMap = {
+    lanham:  { tv: wk.loc.lanham.tv,   rev: wk.loc.lanham.rev,   prod: wk.loc.lanham.prod,   rb: wk.loc.lanham.rb   },
+    bethesda:{ tv: wk.loc.bethesda.tv, rev: wk.loc.bethesda.rev, prod: wk.loc.bethesda.prod, rb: wk.loc.bethesda.rb },
+    combined:{ tv: d.tv, rev: d.rev, prod: d.prod, rb: d.rb },
+  }[v];
+
+  $('h-tv').textContent   = f$(heroMap.tv);
+  $('h-rev').textContent  = f$(heroMap.rev);
+  $('h-prod').textContent = fp(heroMap.prod);
+  $('h-rb').textContent   = fp(heroMap.rb);
+
+  // Hero breakdowns (show in combined only)
+  ['h-tv-b','h-rev-b','h-prod-b','h-rb-b'].forEach(id => {
+    $(id).style.display = isC ? 'flex' : 'none';
+    $(id).style.flexDirection = 'column';
+  });
+  if (isC) {
+    $('h-tv-l').textContent   = 'Lanham '  + f$(wk.loc.lanham.tv);
+    $('h-tv-bl').textContent  = 'Bethesda '+ f$(wk.loc.bethesda.tv);
+    $('h-rev-l').textContent  = 'Lanham '  + f$(wk.loc.lanham.rev);
+    $('h-rev-bl').textContent = 'Bethesda '+ f$(wk.loc.bethesda.rev);
+    $('h-prod-l').textContent = 'Lanham '  + fp(wk.loc.lanham.prod);
+    $('h-prod-bl').textContent= 'Bethesda '+ fp(wk.loc.bethesda.prod);
+    $('h-rb-l').textContent   = 'Lanham '  + fp(wk.loc.lanham.rb);
+    $('h-rb-bl').textContent  = 'Bethesda '+ fp(wk.loc.bethesda.rb);
+  }
+
+  // Hero WoW tags
+  const wkOrder = Object.keys(WEEKS);
+  const prevWkIdx = wkOrder.indexOf(currentWeek) - 1;
+  const prevWk = prevWkIdx >= 0 ? wkOrder[prevWkIdx] : null;
+  if (prevWk) {
+    const pd = getD(v, prevWk);
+    setWow('h-tv-wow',   d.tv   - pd.tv,   '$');
+    setWow('h-rev-wow',  d.rev  - pd.rev,  '$');
+    setWow('h-prod-wow', d.prod - pd.prod, 'pp');
+    setWow('h-rb-wow',   d.rb   - pd.rb,   'pp');
+  } else {
+    ['h-tv-wow','h-rev-wow','h-prod-wow','h-rb-wow'].forEach(id => {
+      const el = $(id);
+      if (el) { el.textContent = ''; el.className = 'wow'; }
+    });
+  }
+
+  // KPI
+  const ncText  = isC ? `L ${wk.loc.lanham.nc} · B ${wk.loc.bethesda.nc}` : '';
+  const neftTxt = isC ? `L ${wk.loc.lanham.neft} · B ${wk.loc.bethesda.neft}` : '';
+  const reftTxt = isC ? `L ${f$(wk.loc.lanham.reft)} · B ${f$(wk.loc.bethesda.reft)}` : '';
+
+  $('k-nc').textContent   = d.nc;
+  $('k-neft').textContent = `${d.neftC} / ${f$(d.neftV)}`;
+  $('k-reft').textContent = f$(d.reft);
+  $('k-mcan').textContent = f$(d.mcan);
+  $('k-mcan').style.color = d.mcan > 0 ? 'var(--red)' : 'var(--green)';
+  $('k-ret').textContent  = f$(d.ret);
+  $('k-tkt').textContent  = f$(d.tkt);
+  $('k-onl').textContent  = fp(d.onl);
+  $('k-ug').textContent   = d.ug;
+  $('k-disc').textContent = f$(d.disc);
+  $('k-disc').style.color = 'var(--amber)';
+  $('k-pr').textContent   = fp(d.pr);
+
+  $('k-nc-s').textContent   = isC ? `L ${wk.loc.lanham.nc} · B ${wk.loc.bethesda.nc}` : '';
+  $('k-neft-s').textContent = isC ? `L ${wk.loc.lanham.neft} · B ${wk.loc.bethesda.neft}` : '';
+  $('k-reft-s').textContent = isC ? `L ${f$(wk.loc.lanham.reft)} · B ${f$(wk.loc.bethesda.reft)}` : '';
+  $('k-mcan-s').textContent = isC ? `L ${f$(wk.loc.lanham.mcan)} · B ${f$(wk.loc.bethesda.mcan)}` : '';
+  $('k-ret-s').textContent  = isC ? `L ${f$(wk.loc.lanham.ret)} · B ${f$(wk.loc.bethesda.ret)}` : '';
+  $('k-tkt-s').textContent  = isC ? `L ${f$(wk.loc.lanham.tkt)} · B ${f$(wk.loc.bethesda.tkt)}` : '';
+  $('k-onl-s').textContent  = isC ? `L ${fp(wk.loc.lanham.onl)} · B ${fp(wk.loc.bethesda.onl)}` : '';
+  $('k-ug-s').textContent   = isC ? `L ${wk.loc.lanham.ug} · B ${wk.loc.bethesda.ug}` : '';
+  $('k-disc-s').textContent = isC ? `L ${f$(wk.loc.lanham.disc)} · B ${f$(wk.loc.bethesda.disc)}` : '';
+  $('k-pr-s').textContent   = isC ? `L ${fp(wk.loc.lanham.pr)} · B ${fp(wk.loc.bethesda.pr)}` : '';
+
+  // Liability
+  const ml = d.ml, pl = d.pl;
+  $('ml-open').textContent = f$(ml.open);
+  $('ml-sold').textContent = '+' + f$(ml.sold);
+  $('ml-red').textContent  = '–' + f$(ml.red);
+  $('ml-can').textContent  = ml.can > 0 ? '–' + f$(ml.can) : '$0';
+  $('ml-can').style.color  = ml.can > 0 ? 'var(--red)' : 'var(--green)';
+  $('ml-close').textContent= f$(ml.close);
+  $('ml-csub').textContent = isC ? 'Combined' : v.charAt(0).toUpperCase()+v.slice(1);
+  $('pl-open').textContent = f$(pl.open);
+  $('pl-sold').textContent = '+' + f$(pl.sold);
+  $('pl-red').textContent  = '–' + f$(pl.red);
+  $('pl-exp').textContent  = pl.exp > 0 ? '–' + f$(pl.exp) : '$0';
+  $('pl-exp').style.color  = pl.exp > 0 ? 'var(--red)' : 'var(--green)';
+  $('pl-close').textContent= f$(pl.close);
+  $('pl-csub').textContent = isC ? 'Combined' : v.charAt(0).toUpperCase()+v.slice(1);
+
+  // ── RATES ──────────────────────────────────────────────────────────────────
+  // Combined rates (for the big rate cards)
+  const mlAvail = ml.open + ml.sold;
+  const plAvail = pl.open + pl.sold;
+  const ml_rr = mlAvail > 0 ? ml.red / mlAvail * 100 : 0;
+  const ml_pr = ml.open > 0 ? ml.red / ml.open * 100 : 0;
+  const pl_rr = plAvail > 0 ? pl.red / plAvail * 100 : 0;
+  const pl_er = plAvail > 0 ? pl.exp / plAvail * 100 : 0;
+  const ml_net = ml.close - ml.open;
+  const pl_net = pl.close - pl.open;
+
+  $('ml-rr').textContent = fp(ml_rr);
+  $('ml-pr').textContent = fp(ml_pr);
+  $('ml-rr-sub').textContent = `${f$(ml.red)} of ${f$(mlAvail)} available`;
+  $('ml-pr-sub').textContent = `${f$(ml.red)} of ${f$(ml.open)} opening bal`;
+  // Normalise bar widths: cap at 15% as reasonable max for weekly rate
+  const norm = (val, max) => Math.min(val/max*100, 100).toFixed(1) + '%';
+  $('ml-rr-bar').style.width = norm(ml_rr, 15);
+  $('ml-pr-bar').style.width = norm(ml_pr, 15);
+
+  $('pl-rr').textContent = fp(pl_rr);
+  $('pl-er').textContent = fp(pl_er);
+  $('pl-rr-bar').style.width = norm(pl_rr, 15);
+  $('pl-er-bar').style.width = norm(pl_er, 15);
+
+  // Per-location breakdown (always show L and B regardless of switcher — these are structural)
+  const wkLoc = WEEKS[currentWeek].loc;
+  const ml_L = wkLoc.lanham.ml, ml_B = wkLoc.bethesda.ml;
+  const pl_L = wkLoc.lanham.pl, pl_B = wkLoc.bethesda.pl;
+
+  const ml_rr_L = (ml_L.open+ml_L.sold) > 0 ? ml_L.red/(ml_L.open+ml_L.sold)*100 : 0;
+  const ml_rr_B = (ml_B.open+ml_B.sold) > 0 ? ml_B.red/(ml_B.open+ml_B.sold)*100 : 0;
+  const pl_rr_L = (pl_L.open+pl_L.sold) > 0 ? pl_L.red/(pl_L.open+pl_L.sold)*100 : 0;
+  const pl_rr_B = (pl_B.open+pl_B.sold) > 0 ? pl_B.red/(pl_B.open+pl_B.sold)*100 : 0;
+  const pl_er_L = (pl_L.open+pl_L.sold) > 0 ? pl_L.exp/(pl_L.open+pl_L.sold)*100 : 0;
+
+  $('ml-rr-l').textContent = fp(ml_rr_L);
+  $('ml-rr-b').textContent = fp(ml_rr_B);
+  $('pl-rr-l').textContent = fp(pl_rr_L);
+  $('pl-rr-b').textContent = fp(pl_rr_B);
+  $('pl-er-l').textContent = fp(pl_er_L);
+  $('ml-rr-l-bar').style.width = norm(ml_rr_L, 15);
+  $('ml-rr-b-bar').style.width = norm(ml_rr_B, 15);
+  $('pl-rr-l-bar').style.width = norm(pl_rr_L, 15);
+  $('pl-rr-b-bar').style.width = norm(pl_rr_B, 15);
+  $('pl-er-l-bar').style.width = norm(pl_er_L, 15);
+
+  const mlNetEl = $('ml-net'), plNetEl = $('pl-net');
+  mlNetEl.textContent = (ml_net >= 0 ? '+' : '') + f$(ml_net);
+  mlNetEl.style.color = ml_net >= 0 ? 'var(--green)' : 'var(--red)';
+  plNetEl.textContent = (pl_net >= 0 ? '+' : '') + f$(pl_net);
+  plNetEl.style.color = pl_net >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Membership table
+  const mems = v === 'combined' ? wk.memberships : wk.memberships.filter(m => m.loc.toLowerCase() === v);
+  const total = mems.reduce((s,m) => s+m.val, 0);
+  const nNew  = mems.filter(m=>m.type==='new').length;
+  const nRec  = mems.filter(m=>m.type==='rec').length;
+  if (mems.length === 0) {
+    $('mem-tbody').innerHTML =
+      `<tr><td colspan="6" style="text-align:center;color:var(--faint);padding:18px 12px;font-size:11px">` +
+      `Per-member detail not available for this week. Aggregate totals are shown in the KPI cards above.` +
+      `</td></tr>`;
+  } else {
+    $('mem-tbody').innerHTML = mems.map(m => `
+      <tr><td>${m.n}</td><td>${m.loc}</td><td class="mem-plan" style="font-size:10px">${m.plan}</td>
+      <td><span class="${m.type==='new'?'new-b':'rec-b'}">${m.type==='new'?'New':'Recurring'}</span></td>
+      <td>${m.date}</td><td>${f$(m.val)}</td></tr>
+    `).join('') + `<tr style="background:var(--surface2);font-weight:700;">
+      <td colspan="5">${mems.length} membership${mems.length!==1?'s':''} (${nNew} new, ${nRec} recurring)</td>
+      <td>${f$(total)}</td></tr>`;
+  }
+
+  // Full report table
+  const L = wk.loc.lanham, B = wk.loc.bethesda;
+  const C = v === 'combined';
+  $('reportTbody').innerHTML = `
+    <tr class="tsec"><td colspan="5">Revenue</td></tr>
+    ${row('Total Value',f$(L.tv),f$(B.tv),f$(L.tv+B.tv),'Business KPI','bb')}
+    ${row('Service Revenue',f$(L.rev),f$(B.rev),f$(L.rev+B.rev),'Business KPI','bb')}
+    ${row('Package Sales',f$(L.revCats[2]),f$(B.revCats[2]),f$(L.revCats[2]+B.revCats[2]),'Business KPI','bb')}
+    ${row('Retail',f$(L.ret),f$(B.ret),f$(L.ret+B.ret),'Business KPI','bb')}
+    ${row('Discounts',f$(L.disc),f$(B.disc),f$(L.disc+B.disc),'Business KPI','bb')}
+    <tr class="tsec"><td colspan="5">Clients &amp; Performance</td></tr>
+    ${row('New Clients (NSR booked)',L.nc,B.nc,L.nc+B.nc,'Appointments','bg')}
+    ${row('Unique Guests',L.ug,B.ug,L.ug+B.ug,'Business KPI','bb')}
+    ${row('Productivity %',fp(L.prod),fp(B.prod),fp(Math.round((L.prod*137.5+B.prod*40)/177.5*10)/10),'Business KPI','bb')}
+    ${row('Rebook %',fp(L.rb),fp(B.rb),fp(Math.round((L.rb+B.rb)/2*10)/10),'Business KPI','bb')}
+    ${row('Avg Service Ticket',f$(L.tkt),f$(B.tkt),f$(Math.round((L.tkt+B.tkt)/2)),'Business KPI','bb')}
+    ${row('Online Booking %',fp(L.onl),fp(B.onl),fp(Math.round((L.onl+B.onl)/2*10)/10),'Business KPI','bb')}
+    <tr class="tsec"><td colspan="5">Memberships (EFT)</td></tr>
+    ${row('New EFT',L.neft,B.neft,`${L.neftC+B.neftC}/${f$(L.neftV+B.neftV)}`,'Memberships','bg')}
+    ${row('Recurring EFT',f$(L.reft),f$(B.reft),f$(L.reft+B.reft),'Mem. Liability','bg')}
+    ${row('Mem Cancellations',f$(L.mcan),f$(B.mcan),f$(L.mcan+B.mcan),'Mem. Liability','bg')}
+    ${row('Membership Closing Bal.',f$(L.ml.close),f$(B.ml.close),f$(L.ml.close+B.ml.close),'Mem. Liability','bg')}
+    <tr class="tsec"><td colspan="5">Packages</td></tr>
+    ${row('Packages Sold',f$(L.revCats[2]),f$(B.revCats[2]),f$(L.revCats[2]+B.revCats[2]),'Business KPI','bb')}
+    ${row('Package Redemptions',f$(L.pl.red),f$(B.pl.red),f$(L.pl.red+B.pl.red),'Pkg. Liability','bg')}
+    ${row('Packages Expired',
+      `<span style="color:${L.pl.exp>0?'var(--red)':'inherit'}">${f$(L.pl.exp)}</span>`,
+      `<span style="color:${B.pl.exp>0?'var(--red)':'inherit'}">${f$(B.pl.exp)}</span>`,
+      `<span style="color:${L.pl.exp+B.pl.exp>0?'var(--red)':'inherit'}">${f$(L.pl.exp+B.pl.exp)}</span>`,
+      'Pkg. Liability','bg')}
+    ${row('Package Closing Bal.',f$(L.pl.close),f$(B.pl.close),f$(L.pl.close+B.pl.close),'Pkg. Liability','bg')}
+  `;
+
+  // Charts
+  updateCharts(d, v);
+
+  // Table col visibility
+  document.querySelectorAll('.col-L,.col-B,.col-C').forEach(el => {
+    if (v === 'lanham')   el.style.display = el.classList.contains('col-L') ? '' : 'none';
+    else if (v === 'bethesda') el.style.display = el.classList.contains('col-B') ? '' : 'none';
+    else el.style.display = el.classList.contains('col-C') ? '' : 'none';
+  });
+}
+
+function row(label, l, b, c, src, badge) {
+  return `<tr><td>${label}</td><td class="col-L">${l}</td><td class="col-B">${b}</td><td class="col-C"><strong>${c}</strong></td><td class="col-src"><span class="bdg ${badge}">${src}</span></td></tr>`;
+}
+
+function setWow(id, delta, unit) {
+  const el = $(id);
+  if (!el) return;
+  const abs = Math.abs(delta);
+  const fmt = unit === '$' ? f$(abs) : abs.toFixed(1) + unit;
+  const up  = delta >= 0;
+  el.textContent = (up ? '▲ +' : '▼ –') + fmt + ' vs prior week';
+  el.className   = 'wow ' + (up ? 'up' : 'dn');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════════════════════════
+function makeOrUpdate(id, type, data, options) {
+  if (charts[id]) { charts[id].destroy(); }
+  charts[id] = new Chart($(id), { type, data, options });
+}
+
+const chartOpts = (yFmt) => ({
+  responsive:true, maintainAspectRatio:false,
+  plugins:{ legend:{display:false} },
+  scales:{
+    x:{ grid:{display:false}, border:{display:false} },
+    y:{ grid:{color:'#F2F2F2'}, border:{display:false}, ticks:{callback: yFmt || (v=>v)} }
+  }
+});
+
+// Aliases used by the monthly view
+const mkChart = makeOrUpdate;
+const co = chartOpts;
+
+function updateCharts(d, v) {
+  const isSingle = v !== 'combined';
+  const barColor = v==='lanham' ? blue : v==='bethesda' ? gold : null;
+
+  // Revenue bar
+  makeOrUpdate('revChart','bar',{
+    labels:['Services','EFT','Packages','Retail'],
+    datasets:[{
+      data: d.revCats,
+      backgroundColor: barColor || [navy,gold,blue,'#27500A'],
+      borderRadius:5, borderSkipped:false
+    }]
+  }, chartOpts(v => '$'+v.toLocaleString()));
+
+  // Mix donut
+  makeOrUpdate('mixChart','doughnut',{
+    labels:['Services','EFT','Packages','Retail'],
+    datasets:[{ data:d.revCats, backgroundColor:[navy,gold,blue,'#27500A'], borderWidth:0, hoverOffset:6 }]
+  },{
+    responsive:true, maintainAspectRatio:false, cutout:'68%',
+    plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.toLocaleString()}} }
+  });
+
+  // Productivity vs Rebook
+  makeOrUpdate('prodChart','bar',{
+    labels:['Productivity %','Rebook %'],
+    datasets:[{ data:[d.prod, d.rb], backgroundColor:[navy,gold], borderRadius:5, borderSkipped:false }]
+  }, {...chartOpts(v=>v+'%'), scales:{x:{grid:{display:false},border:{display:false}},y:{min:0,max:100,grid:{color:'#F2F2F2'},border:{display:false},ticks:{callback:v=>v+'%'}}}});
+
+  // Service mix
+  const svcKeys = Object.keys(d.svc), svcVals = Object.values(d.svc);
+  makeOrUpdate('svcChart','doughnut',{
+    labels: svcKeys,
+    datasets:[{ data:svcVals, backgroundColor:['#111111','#3A3A3A','#6B7885','#888888','#BBC4CB','#DDE1E4'], borderWidth:0, hoverOffset:6 }]
+  },{
+    responsive:true, maintainAspectRatio:false, cutout:'55%',
+    plugins:{ legend:{position:'bottom',labels:{boxWidth:8,padding:6,font:{size:9}}}, tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+ctx.parsed}} }
+  });
+
+  // Booking source
+  const bsrcK = Object.keys(d.bsrc), bsrcV = Object.values(d.bsrc);
+  makeOrUpdate('bsrcChart','bar',{
+    labels: bsrcK,
+    datasets:[{ data:bsrcV, backgroundColor:[navy,blue,gold,green,amber,red], borderRadius:4, borderSkipped:false }]
+  },{
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{ x:{grid:{color:'#F2F2F2'},border:{display:false}}, y:{grid:{display:false},border:{display:false}} }
+  });
+
+  // Mem liability waterfall
+  const ml = d.ml;
+  makeOrUpdate('memChart','bar',{
+    labels:['Opening','+Sold','–Redeemed','–Cancelled','Closing'],
+    datasets:[{ data:[ml.open,ml.sold,-ml.red,-ml.can,ml.close], backgroundColor:[navy,green,amber,ml.can>0?red:green,blue], borderRadius:4, borderSkipped:false }]
+  }, chartOpts(v=>'$'+(v/1000).toFixed(0)+'k'));
+
+  // Pkg liability waterfall
+  const pl = d.pl;
+  makeOrUpdate('pkgChart','bar',{
+    labels:['Opening','+Sold','–Redeemed','–Expired','Closing'],
+    datasets:[{ data:[pl.open,pl.sold,-pl.red,-pl.exp,pl.close], backgroundColor:[navy,green,amber,red,blue], borderRadius:4, borderSkipped:false }]
+  }, chartOpts(v=>'$'+(v/1000).toFixed(0)+'k'));
+
+  // 3-week trend — always combined, all weeks in WEEKS automatically
+  const wkKeys = Object.keys(WEEKS);
+  const wkLabels = wkKeys.map(k => WEEKS[k].shortLabel);
+  const tvTrend  = wkKeys.map(k => combined(WEEKS[k]).tv);
+  const revTrend = wkKeys.map(k => combined(WEEKS[k]).rev);
+  const ncTrend  = wkKeys.map(k => combined(WEEKS[k]).nc);
+  const rbTrend  = wkKeys.map(k => combined(WEEKS[k]).rb);
+  const prTrend  = wkKeys.map(k => combined(WEEKS[k]).prod);
+
+  makeOrUpdate('trendRevChart','line',{
+    labels: wkLabels,
+    datasets:[
+      { label:'Total Value', data:tvTrend,  borderColor:navy,  backgroundColor:navy+'20',  tension:.3, fill:true, pointRadius:5, pointBackgroundColor:navy },
+      { label:'Service Rev', data:revTrend, borderColor:blue, backgroundColor:blue+'20', tension:.3, fill:false, pointRadius:5, pointBackgroundColor:blue, borderDash:[4,3] },
+    ]
+  },{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{ x:{grid:{display:false},border:{display:false}}, y:{grid:{color:'#F2F2F2'},border:{display:false},ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k'}} }
+  });
+
+  makeOrUpdate('trendOpsChart','line',{
+    labels: wkLabels,
+    datasets:[
+      { label:'New Clients', data:ncTrend, borderColor:navy,  tension:.3, pointRadius:5, pointBackgroundColor:navy, yAxisID:'y' },
+      { label:'Rebook %',   data:rbTrend, borderColor:gold,  tension:.3, pointRadius:5, pointBackgroundColor:gold, borderDash:[4,3], yAxisID:'y2' },
+      { label:'Productivity',data:prTrend,borderColor:blue, tension:.3, pointRadius:5, pointBackgroundColor:blue, borderDash:[2,4], yAxisID:'y2' },
+    ]
+  },{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{
+      x:  { grid:{display:false}, border:{display:false} },
+      y:  { grid:{color:'#F2F2F2'}, border:{display:false}, position:'left',  ticks:{color:'#888888'} },
+      y2: { grid:{display:false},  border:{display:false}, position:'right', ticks:{callback:v=>v+'%', color:'#AAAAAA'} }
+    }
+  });
+  // 3-week rate trend — always combined, all weeks
+  function calcRates(wkKey) {
+    const wk = WEEKS[wkKey];
+    const mlL = wk.loc.lanham.ml,   mlB = wk.loc.bethesda.ml;
+    const plL = wk.loc.lanham.pl,   plB = wk.loc.bethesda.pl;
+    const ml_avail = mlL.open+mlL.sold + mlB.open+mlB.sold;
+    const pl_avail = plL.open+plL.sold + plB.open+plB.sold;
+    const ml_red   = mlL.red + mlB.red;
+    const pl_red   = plL.red + plB.red;
+    const pl_exp   = plL.exp + plB.exp;
+    return {
+      ml_rr: ml_avail > 0 ? +(ml_red/ml_avail*100).toFixed(2) : 0,
+      pl_rr: pl_avail > 0 ? +(pl_red/pl_avail*100).toFixed(2) : 0,
+      pl_er: pl_avail > 0 ? +(pl_exp/pl_avail*100).toFixed(2) : 0,
+    };
+  }
+  const rateData = wkKeys.map(calcRates);
+  makeOrUpdate('rateTrendChart','line',{
+    labels: wkLabels,
+    datasets:[
+      { label:'Mem Redemption %', data:rateData.map(r=>r.ml_rr), borderColor:gold,  backgroundColor:gold+'25',  tension:.3, fill:true,  pointRadius:5, pointBackgroundColor:gold },
+      { label:'Pkg Redemption %', data:rateData.map(r=>r.pl_rr), borderColor:blue,  backgroundColor:blue+'15', tension:.3, fill:false, pointRadius:5, pointBackgroundColor:blue,  borderDash:[4,3] },
+      { label:'Pkg Expiry %',     data:rateData.map(r=>r.pl_er), borderColor:red,   backgroundColor:'transparent', tension:.3, fill:false, pointRadius:5, pointBackgroundColor:red,   borderDash:[2,4] },
+    ]
+  },{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{ display:true, position:'bottom', labels:{ boxWidth:9, padding:14, font:{size:10} } },
+      tooltip:{ callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` } }
+    },
+    scales:{
+      x:{ grid:{display:false}, border:{display:false} },
+      y:{ grid:{color:'#F2F2F2'}, border:{display:false}, ticks:{ callback:v=>v+'%' }, min:0, max:10 }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MONTHLY VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+let currentMode = 'weekly'; // 'weekly' | 'monthly'
+let currentMonthKey = null;
+
+function loadMonthly(key) {
+  currentMode = 'monthly';
+  currentMonthKey = key;
+  document.querySelectorAll('.week-item').forEach(el => el.classList.remove('active'));
+  const panelEl = $('panel-'+key);
+  if (panelEl) panelEl.classList.add('active');
+  document.querySelectorAll('.mob-week').forEach(el => el.classList.toggle('active', el.dataset.wk === 'monthly-'+key));
+  $('weeklySection').style.display = 'none';
+  $('monthlySection').style.display = 'block';
+  const m = MONTHLY[key];
+  $('weekPill').textContent = m.label;
+  $('ftrWeek').textContent = m.label + ' Summary';
+  if (window.innerWidth <= 600 && panelOpen) togglePanel();
+  renderMonthly(key);
+}
+
+function loadWeek(k) {
+  currentMode = 'weekly';
+  currentWeek = k;
+  document.querySelectorAll('.week-item').forEach(el => el.classList.toggle('active', el.getAttribute('onclick')?.includes("'"+k+"'")));
+  document.querySelectorAll('.mob-week').forEach(el => el.classList.toggle('active', el.dataset.wk === k));
+  if ($('panel-april2026')) $('panel-april2026').classList.remove('active');
+  $('weeklySection').style.display = 'block';
+  $('monthlySection').style.display = 'none';
+  if (window.innerWidth <= 600 && panelOpen) togglePanel();
+  renderAll();
+}
+
+function renderMonthly(key) {
+  const m = MONTHLY[key];
+  const v = currentView;
+  const isC = v === 'combined';
+  const L = m.loc.lanham, B = m.loc.bethesda;
+  const C = { tv:L.tv+B.tv, rev:L.rev+B.rev, pkg:L.pkg+B.pkg, ret:L.ret+B.ret, disc:L.disc+B.disc,
+    nc:L.nc+B.nc, neftC:L.neftC+B.neftC, neftV:L.neftV+B.neftV, reft:L.reft+B.reft, mcan:L.mcan+B.mcan,
+    ug:L.ug+B.ug, invC:L.invC+B.invC, prod:Math.round((L.prod*137.5+B.prod*40)/177.5*10)/10,
+    rb:Math.round((L.rb*L.invC+B.rb*B.invC)/(L.invC+B.invC)*10)/10,
+    onl:Math.round((L.onl+B.onl)/2*10)/10, tkt:Math.round((L.tkt+B.tkt)/2),
+    memOpen:L.memOpen+B.memOpen, memSold:L.memSold+B.memSold, memRed:L.memRed+B.memRed, memCan:L.memCan+B.memCan, memClose:L.memClose+B.memClose,
+    pkgOpen:L.pkgOpen+B.pkgOpen, pkgSold:L.pkgSold+B.pkgSold, pkgRed:L.pkgRed+B.pkgRed, pkgExp:L.pkgExp+B.pkgExp, pkgClose:L.pkgClose+B.pkgClose,
+    revCats:L.revCats.map((v,i)=>v+B.revCats[i]),
+  };
+  const d = isC ? C : (v === 'lanham' ? L : B);
+
+  $('monthlyNote').innerHTML = `<strong>${m.label}</strong> &nbsp;·&nbsp; ${m.note} &nbsp;·&nbsp; <span style="color:var(--muted)">Use the location switcher to filter by center</span>`;
+
+  // Hero
+  $('mo-tv').textContent  = f$(d.tv);   $('mo-tv-s').textContent  = isC ? `L ${f$(L.tv)} · B ${f$(B.tv)}` : '';
+  $('mo-rev').textContent = f$(d.rev);  $('mo-rev-s').textContent = isC ? `L ${f$(L.rev)} · B ${f$(B.rev)}` : '';
+  $('mo-prod').textContent= fp(d.prod); $('mo-prod-s').textContent= isC ? `L ${fp(L.prod)} · B ${fp(B.prod)}` : '';
+  $('mo-rb').textContent  = fp(d.rb);   $('mo-rb-s').textContent  = isC ? `L ${fp(L.rb)} · B ${fp(B.rb)}` : '';
+
+  // KPIs
+  $('mo-nc').textContent   = d.nc;                $('mo-nc-s').textContent   = isC ? `L ${L.nc} · B ${B.nc}` : '';
+  $('mo-neft').textContent = `${d.neftC} / ${f$(d.neftV)}`; $('mo-neft-s').textContent = isC ? `L ${L.neftC}/${f$(L.neftV)} · B ${B.neftC}/${f$(B.neftV)}` : '';
+  $('mo-reft').textContent = f$(d.reft);          $('mo-reft-s').textContent = isC ? `L ${f$(L.reft)} · B ${f$(B.reft)}` : '';
+  $('mo-mcan').textContent = f$(d.mcan);          $('mo-mcan').style.color = d.mcan > 0 ? 'var(--red)' : 'var(--green)';
+  $('mo-ret').textContent  = f$(d.ret);           $('mo-ret-s').textContent  = isC ? `L ${f$(L.ret)} · B ${f$(B.ret)}` : '';
+  $('mo-pkg').textContent  = f$(d.pkg);           $('mo-pkg-s').textContent  = isC ? `L ${f$(L.pkg)} · B ${f$(B.pkg)}` : '';
+  $('mo-disc').textContent = f$(d.disc);          $('mo-disc-s').textContent = isC ? `L ${f$(L.disc)} · B ${f$(B.disc)}` : '';
+  $('mo-ug').textContent   = d.ug;                $('mo-ug-s').textContent   = isC ? `L ${L.ug} · B ${B.ug}` : '';
+  $('mo-inv').textContent  = d.invC;              $('mo-inv-s').textContent  = isC ? `L ${L.invC} · B ${B.invC}` : '';
+  $('mo-tkt').textContent  = f$(d.tkt);           $('mo-tkt-s').textContent  = isC ? `L ${f$(L.tkt)} · B ${f$(B.tkt)}` : '';
+
+  // Liability
+  $('mo-ml-open').textContent = f$(d.memOpen);
+  $('mo-ml-sold').textContent = '+' + f$(d.memSold);
+  $('mo-ml-red').textContent  = '–' + f$(d.memRed);
+  $('mo-ml-can').textContent  = d.memCan > 0 ? '–'+f$(d.memCan) : '$0';
+  $('mo-ml-can').style.color  = d.memCan > 0 ? 'var(--red)' : 'var(--green)';
+  $('mo-ml-close').textContent= f$(d.memClose);
+  $('mo-ml-csub').textContent = isC ? 'Combined' : v.charAt(0).toUpperCase()+v.slice(1);
+  $('mo-pl-open').textContent = f$(d.pkgOpen);
+  $('mo-pl-sold').textContent = '+' + f$(d.pkgSold);
+  $('mo-pl-red').textContent  = '–' + f$(d.pkgRed);
+  $('mo-pl-exp').textContent  = d.pkgExp > 0 ? '–'+f$(d.pkgExp) : '$0';
+  $('mo-pl-close').textContent= f$(d.pkgClose);
+  $('mo-pl-csub').textContent = isC ? 'Combined' : v.charAt(0).toUpperCase()+v.slice(1);
+  const mlAvail=d.memOpen+d.memSold, plAvail=d.pkgOpen+d.pkgSold;
+  const ml_rr=mlAvail>0?d.memRed/mlAvail*100:0, pl_rr=plAvail>0?d.pkgRed/plAvail*100:0, pl_er=plAvail>0?d.pkgExp/plAvail*100:0;
+  const ml_net=d.memClose-d.memOpen, pl_net_up=pl_rr>0;
+  $('mo-ml-rr').textContent=fp(ml_rr); $('mo-ml-rr-bar').style.width=Math.min(ml_rr/25*100,100).toFixed(1)+'%';
+  const mln=$('mo-ml-net'); mln.textContent=(ml_net>=0?'+':'')+f$(ml_net); mln.style.color=ml_net>=0?'var(--green)':'var(--red)';
+  $('mo-pl-rr').textContent=fp(pl_rr); $('mo-pl-rr-bar').style.width=Math.min(pl_rr/25*100,100).toFixed(1)+'%';
+  $('mo-pl-er').textContent=fp(pl_er); $('mo-pl-er-bar').style.width=Math.min(pl_er/25*100,100).toFixed(1)+'%';
+
+  // Full monthly table
+  $('moReportTbody').innerHTML = `
+    <tr class="tsec"><td colspan="4">Revenue</td></tr>
+    ${mrow('Total Value',f$(L.tv),f$(B.tv),f$(C.tv))}
+    ${mrow('Service Revenue',f$(L.rev),f$(B.rev),f$(C.rev))}
+    ${mrow('Package Sales',f$(L.pkg),f$(B.pkg),f$(C.pkg))}
+    ${mrow('Retail',f$(L.ret),f$(B.ret),f$(C.ret))}
+    ${mrow('Discounts',f$(L.disc),f$(B.disc),f$(C.disc))}
+    <tr class="tsec"><td colspan="4">Clients &amp; Performance</td></tr>
+    ${mrow('New Clients (NSR)',L.nc,B.nc,C.nc)}
+    ${mrow('Unique Guests',L.ug,B.ug,C.ug)}
+    ${mrow('Total Invoices',L.invC,B.invC,C.invC)}
+    ${mrow('Avg Productivity %',fp(L.prod),fp(B.prod),fp(C.prod))}
+    ${mrow('Avg Rebook %',fp(L.rb),fp(B.rb),fp(C.rb))}
+    ${mrow('Avg Service Ticket',f$(L.tkt),f$(B.tkt),f$(C.tkt))}
+    <tr class="tsec"><td colspan="4">Memberships</td></tr>
+    ${mrow('New EFT',`${L.neftC}/${f$(L.neftV)}`,`${B.neftC}/${f$(B.neftV)}`,`${C.neftC}/${f$(C.neftV)}`)}
+    ${mrow('Recurring EFT',f$(L.reft),f$(B.reft),f$(C.reft))}
+    ${mrow('Mem Redemptions',f$(L.memRed),f$(B.memRed),f$(C.memRed))}
+    ${mrow('Membership Closing Bal.',f$(L.memClose),f$(B.memClose),f$(C.memClose))}
+    <tr class="tsec"><td colspan="4">Packages</td></tr>
+    ${mrow('Pkg Redemptions',f$(L.pkgRed),f$(B.pkgRed),f$(C.pkgRed))}
+    ${mrow('Pkg Expirations',`<span style="color:var(--red)">${f$(L.pkgExp)}</span>`,`<span style="color:var(--red)">${f$(B.pkgExp)}</span>`,`<span style="color:var(--red)">${f$(C.pkgExp)}</span>`)}
+    ${mrow('Package Closing Bal.',f$(L.pkgClose),f$(B.pkgClose),f$(C.pkgClose))}
+  `;
+
+  // Monthly charts
+  const wkKeys = m.weeks;
+  const wkLabels = wkKeys.map(k => WEEKS[k].shortLabel);
+  const wkTv  = wkKeys.map(k => { const c=combined(WEEKS[k]); return v==='combined'?c.tv:v==='lanham'?WEEKS[k].loc.lanham.tv:WEEKS[k].loc.bethesda.tv; });
+  const wkNc  = wkKeys.map(k => { const c=combined(WEEKS[k]); return v==='combined'?c.nc:v==='lanham'?WEEKS[k].loc.lanham.nc:WEEKS[k].loc.bethesda.nc; });
+  const barC  = v==='lanham'?blue:v==='bethesda'?gold:[navy,gold,blue];
+
+  mkChart('mo-weekRevChart','bar',{labels:wkLabels,datasets:[{data:wkTv,backgroundColor:Array.isArray(barC)?[blue,navy,gold]:barC,borderRadius:5,borderSkipped:false}]},co(v=>'$'+(v/1000).toFixed(0)+'k'));
+  mkChart('mo-weekNcChart','bar',{labels:wkLabels,datasets:[{data:wkNc,backgroundColor:Array.isArray(barC)?[blue,navy,gold]:barC,borderRadius:5,borderSkipped:false}]},co());
+  mkChart('mo-revCatChart','bar',{
+    labels:['Services','Recurring EFT','Packages','Retail'],
+    datasets:[
+      {label:'Lanham', data:L.revCats, backgroundColor:blue+'CC', borderRadius:4,borderSkipped:false},
+      {label:'Bethesda', data:B.revCats, backgroundColor:gold+'CC', borderRadius:4,borderSkipped:false},
+    ]
+  },{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:9,padding:12,font:{size:10}}}},scales:{x:{grid:{display:false},border:{display:false}},y:{grid:{color:'#F2F2F2'},border:{display:false},ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k'}}}});
+  mkChart('mo-mixChart','doughnut',{labels:['Services','EFT','Packages','Retail'],datasets:[{data:d.revCats,backgroundColor:[navy,gold,blue,'#27500A'],borderWidth:0,hoverOffset:6}]},{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.toLocaleString()}}}});
+
+  // Table col visibility
+  document.querySelectorAll('.col-L,.col-B,.col-C').forEach(el=>{
+    if(v==='lanham') el.style.display=el.classList.contains('col-L')?'':'none';
+    else if(v==='bethesda') el.style.display=el.classList.contains('col-B')?'':'none';
+    else el.style.display=el.classList.contains('col-C')?'':'none';
+  });
+}
+
+function mrow(label,l,b,c){return `<tr><td>${label}</td><td class="col-L">${l}</td><td class="col-B">${b}</td><td class="col-C"><strong>${c}</strong></td></tr>`;}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+renderAll();
+</script>
+</body>
+</html>
