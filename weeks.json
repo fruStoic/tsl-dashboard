@@ -1,5 +1,48 @@
 [
   {
+    "id": "2026-08-31",
+    "label": "Aug 31 - Sep 6, 2026",
+    "shortLabel": "Aug 31 - Sep 6",
+    "isSeed": true,
+    "meta": {
+      "purpose": "Seed entry for waterfall opening-balance chaining. Not displayed in the dashboard sidebar. Values reflect closing balances from hand-curated w24 data (Business KPI export, Aug 31-Sep 6, 2026)."
+    },
+    "loc": {
+      "lanham": {
+        "ml": {
+          "open": 0,
+          "sold": 0,
+          "red": 0,
+          "can": 0,
+          "close": 61098
+        },
+        "pl": {
+          "open": 0,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 20070
+        }
+      },
+      "bethesda": {
+        "ml": {
+          "open": 0,
+          "sold": 0,
+          "red": 0,
+          "can": 0,
+          "close": 37150
+        },
+        "pl": {
+          "open": 0,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 20728
+        }
+      }
+    }
+  },
+  {
     "id": "2026-09-07",
     "label": "Sep 7 - Sep 13, 2026",
     "shortLabel": "Sep 7 - Sep 13",
@@ -362,7 +405,7 @@
       "priorWeekChained": false,
       "notes": {
         "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
-        "pl_exp": "package expirations not derived from sales endpoint — set to 0"
+        "pl_exp": "package expirations not derived from sales endpoint \u2014 set to 0"
       }
     }
   }
