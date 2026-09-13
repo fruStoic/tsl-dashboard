@@ -2725,6 +2725,60 @@ renderAll();
     console.warn('Live banner unavailable:', err && err.message);
   }
 })();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AUTO-WEEK SIDEBAR MERGE — n8n now pushes the full WEEKS shape, so we
+// just merge entries directly (no adapter needed) and add to sidebar.
+// Each auto-week gets an "AUTO" badge in the sidebar to distinguish it.
+// ═══════════════════════════════════════════════════════════════════════════
+(async function mergeAutoWeeks() {
+  const WEEKS_JSON_URL = 'https://raw.githubusercontent.com/frustoic/tsl-dashboard/main/weeks.json';
+  try {
+    const res = await fetch(WEEKS_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) return;
+    const autoWeeks = await res.json();
+    if (!Array.isArray(autoWeeks) || autoWeeks.length === 0) return;
+
+    // Sort newest-first so we prepend in the right order
+    const sorted = autoWeeks.slice().sort((a, b) => b.id.localeCompare(a.id));
+
+    sorted.forEach(function(autoWk) {
+      // Skip if a curated week already covers the same date range
+      const shortLabel = autoWk.shortLabel || autoWk.label || autoWk.id;
+      const alreadyExists = Object.values(WEEKS).some(function(w) {
+        return w.shortLabel && w.shortLabel.trim() === shortLabel.trim();
+      });
+      if (alreadyExists) return;
+
+      // Pass entry through directly — n8n now emits the full WEEKS shape
+      const key = 'auto_' + autoWk.id;
+      WEEKS[key] = autoWk;
+      injectAutoWeekIntoSidebar(key, autoWk);
+    });
+  } catch (err) {
+    console.warn('Auto-week merge failed:', err && err.message);
+  }
+})();
+
+// Insert into sidebar (prepend to first month section)
+function injectAutoWeekIntoSidebar(key, wk) {
+  const firstMonthItems = document.querySelector('.panel-month-items');
+  if (!firstMonthItems) return;
+
+  const div = document.createElement('div');
+  div.className = 'week-item';
+  div.setAttribute('onclick', "loadWeek('" + key + "')");
+  const shortLabel = wk.shortLabel || wk.label || wk.id;
+  const totalVal = wk.totalValC || 0;
+  div.innerHTML =
+    '<span class="wi-dot" style="background:#BBC4CB;"></span>' +
+    '<span class="wi-label">' + shortLabel +
+      ' <span style="display:inline-block;font-size:8px;background:#111;color:#BBC4CB;padding:1px 5px;letter-spacing:1.5px;margin-left:6px;font-family:Oswald,sans-serif;vertical-align:middle;">AUTO</span>' +
+    '</span>' +
+    '<span class="wi-val">$' + totalVal.toLocaleString('en-US') + '</span>';
+
+  firstMonthItems.insertBefore(div, firstMonthItems.firstChild);
+}
 </script>
 </body>
 </html>
