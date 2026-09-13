@@ -88,18 +88,18 @@
           "Zenoti": 94
         },
         "ml": {
-          "open": 0,
+          "open": 61098,
           "sold": 3649,
           "red": 2548,
           "can": 0,
-          "close": 1101
+          "close": 62199
         },
         "pl": {
-          "open": 0,
+          "open": 20070,
           "sold": 3660,
           "red": 2556,
           "exp": 0,
-          "close": 1104
+          "close": 21174
         }
       },
       "bethesda": {
@@ -136,18 +136,18 @@
           "Zenoti": 26
         },
         "ml": {
-          "open": 0,
+          "open": 37150,
           "sold": 3011,
           "red": 1158,
           "can": 0,
-          "close": 1853
+          "close": 39003
         },
         "pl": {
-          "open": 0,
+          "open": 20728,
           "sold": 0,
           "red": 0,
           "exp": 0,
-          "close": 0
+          "close": 20728
         }
       }
     },
@@ -400,12 +400,12 @@
       }
     ],
     "meta": {
-      "generatedAt": "2026-09-13T15:37:06.551Z",
+      "generatedAt": "2026-09-13T18:43:37.673Z",
       "narrativeSource": "claude-sonnet-5",
-      "priorWeekChained": false,
+      "priorWeekChained": true,
       "notes": {
         "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
-        "pl_exp": "package expirations not derived from sales endpoint \u2014 set to 0"
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0"
       }
     }
   }
