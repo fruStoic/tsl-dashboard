@@ -1,223 +1,285 @@
 [
   {
     "id": "2026-09-07",
-    "label": "Sep 7 - Sep 13",
-    "dateRange": {
-      "start": "2026-09-07",
-      "end": "2026-09-13"
-    },
-    "combined": {
-      "tv": 23630.43,
-      "service": 11133.66,
-      "product": 1173.77,
-      "membership": 6718,
-      "packageRev": 3660,
-      "nc": 18,
-      "invC": 120,
-      "apptC": 113,
-      "cancelled": 0,
-      "noshow": 0
-    },
-    "lanham": {
-      "tv": 18722.74,
-      "service": 9587.66,
-      "product": 1161.08,
-      "membership": 3649,
-      "packageRev": 3660,
-      "invC": 94,
-      "nc": 14,
-      "apptC": 88,
-      "active": 82,
-      "cancelled": 0,
-      "noshow": 0,
-      "prod": 26
-    },
-    "bethesda": {
-      "tv": 4907.69,
-      "service": 1546,
-      "product": 12.69,
-      "membership": 3069,
-      "packageRev": 0,
-      "invC": 26,
-      "nc": 4,
-      "apptC": 25,
-      "active": 25,
-      "cancelled": 0,
-      "noshow": 0,
-      "prod": 19
-    },
-    "mtd": {
-      "tv": 40297.41,
-      "service": 19484.16,
-      "membership": 13198,
-      "packageRev": 4159,
-      "invC": 227
-    },
-    "wow": {
-      "tv": 7720.81,
-      "tvPct": 49,
-      "service": 3068.16,
-      "servicePct": 38,
-      "nc": 3,
-      "invC": 14,
-      "membership": 837
-    },
-    "newEFTs": [
-      {
-        "name": "Jennifer Maquez",
-        "plan": "FAMILY FLEX",
-        "value": 599,
-        "center": "Bethesda",
-        "date": "2026-09-12"
-      },
-      {
-        "name": "Tarah Massey",
-        "plan": "FAMILY FLEX",
-        "value": 599,
-        "center": "Lanham",
-        "date": "2026-09-11"
-      },
-      {
-        "name": "Marcella Gutierrez",
-        "plan": "LIFESTYLE FLEX",
-        "value": 349,
-        "center": "Bethesda",
-        "date": "2026-09-12"
-      },
-      {
-        "name": "Carolyn Parker",
-        "plan": "LIFESTYLE FLEX",
-        "value": 349,
-        "center": "Lanham",
-        "date": "2026-09-11"
-      },
-      {
-        "name": "Shannon Thompson",
-        "plan": "PARTNER FLEX",
-        "value": 329,
-        "center": "Bethesda",
-        "date": "2026-09-09"
-      },
-      {
-        "name": "Danielle Weiss",
-        "plan": "PARTNER FLEX",
-        "value": 329,
-        "center": "Bethesda",
-        "date": "2026-09-07"
-      }
-    ],
-    "providers": [
-      {
-        "name": "Dr Akmal Muwwakkil",
-        "hours": 2,
-        "prod": 5,
-        "appts": 1,
-        "rebookPct": 0,
-        "center": "Lanham"
-      },
-      {
-        "name": "Christian GoodeHill",
-        "hours": 2,
-        "prod": 5,
-        "appts": 2,
-        "rebookPct": 50,
-        "center": "Bethesda"
-      },
-      {
-        "name": "Hang Wang",
-        "hours": 2,
-        "prod": 5,
-        "appts": 2,
-        "rebookPct": 0,
-        "center": "Bethesda"
-      },
-      {
-        "name": "Ben Atanga",
-        "hours": 2.5,
-        "prod": 6,
-        "appts": 2,
-        "rebookPct": 0,
-        "center": "Lanham"
-      },
-      {
-        "name": "Joy Blanchard",
-        "hours": 4.3,
-        "prod": 11,
-        "appts": 4,
-        "rebookPct": 50,
-        "center": "Lanham"
-      },
-      {
-        "name": "Kayani Turner",
-        "hours": 5.5,
-        "prod": 14,
-        "appts": 5,
-        "rebookPct": 20,
-        "center": "Lanham"
-      },
-      {
-        "name": "Lynton McCrae",
-        "hours": 9.5,
-        "prod": 24,
-        "appts": 6,
-        "rebookPct": 33,
-        "center": "Lanham"
-      },
-      {
-        "name": "Christian GoodeHill",
-        "hours": 10.5,
+    "label": "Sep 7 - Sep 13, 2026",
+    "shortLabel": "Sep 7 - Sep 13",
+    "totalValC": 23630,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue up 49% WoW ($23630.43). New clients: 18 combined.",
+    "loc": {
+      "lanham": {
+        "tv": 18722.74,
+        "rev": 9587.66,
         "prod": 26,
-        "appts": 10,
-        "rebookPct": 0,
-        "center": "Lanham"
+        "rb": 39,
+        "nc": 14,
+        "neft": "2/$948",
+        "neftC": 2,
+        "neftV": 948,
+        "reft": 2701,
+        "mcan": 0,
+        "ret": 1161.08,
+        "tkt": 135,
+        "onl": 0,
+        "ug": 79,
+        "disc": 2198,
+        "pr": 0,
+        "invC": 94,
+        "rebC": 32,
+        "revCats": [
+          9588,
+          3649,
+          3660,
+          1161
+        ],
+        "svc": {
+          "Stretch @ The Loft": 45,
+          "Enhancements": 6,
+          "Other": 14,
+          "Massage @ The Loft": 1,
+          "New Client Stretch": 14,
+          "Dr Akmal": 1,
+          "Ben The Baptist ": 1
+        },
+        "bsrc": {
+          "1": 14,
+          "-1": 68
+        },
+        "ml": {
+          "open": 0,
+          "sold": 3649,
+          "red": 2548,
+          "can": 0,
+          "close": 1101
+        },
+        "pl": {
+          "open": 0,
+          "sold": 3660,
+          "red": 2556,
+          "exp": 0,
+          "close": 1104
+        }
+      },
+      "bethesda": {
+        "tv": 4907.69,
+        "rev": 1546,
+        "prod": 19,
+        "rb": 32,
+        "nc": 4,
+        "neft": "4/$1,606",
+        "neftC": 4,
+        "neftV": 1606,
+        "reft": 1405,
+        "mcan": 0,
+        "ret": 12.69,
+        "tkt": 141,
+        "onl": 0,
+        "ug": 22,
+        "disc": 481,
+        "pr": 0,
+        "invC": 26,
+        "rebC": 8,
+        "revCats": [
+          1546,
+          3011,
+          0,
+          13
+        ],
+        "svc": {
+          "New Client Stretch": 6,
+          "Stretch @ The Loft": 10,
+          "Other": 9
+        },
+        "bsrc": {
+          "1": 3,
+          "-1": 22
+        },
+        "ml": {
+          "open": 0,
+          "sold": 3011,
+          "red": 1158,
+          "can": 0,
+          "close": 1853
+        },
+        "pl": {
+          "open": 0,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 0
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Tarah Massey",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "new",
+        "date": "09/11",
+        "val": 599
       },
       {
-        "name": "LaToshia McQueen",
-        "hours": 13.5,
-        "prod": 34,
-        "appts": 14,
-        "rebookPct": 57,
-        "center": "Lanham"
+        "n": "Jennifer Maquez",
+        "loc": "Bethesda",
+        "plan": "FAMILY FLEX",
+        "type": "new",
+        "date": "09/12",
+        "val": 599
       },
       {
-        "name": "Monica Walker",
-        "hours": 15.3,
-        "prod": 38,
-        "appts": 5,
-        "rebookPct": 20,
-        "center": "Lanham"
+        "n": "Carolyn Parker",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "09/11",
+        "val": 349
       },
       {
-        "name": "Nigel Johnson",
-        "hours": 19,
-        "prod": 48,
-        "appts": 7,
-        "rebookPct": 14,
-        "center": "Lanham"
+        "n": "Bouyea Amen El",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "09/08",
+        "val": 349
       },
       {
-        "name": "Lawrence Coley",
-        "hours": 19,
-        "prod": 48,
-        "appts": 21,
-        "rebookPct": 33,
-        "center": "Bethesda"
+        "n": "Erica Patterson",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "09/08",
+        "val": 349
       },
       {
-        "name": "Victoria White",
-        "hours": 23.3,
-        "prod": 58,
-        "appts": 28,
-        "rebookPct": 61,
-        "center": "Lanham"
+        "n": "Marcella Gutierrez",
+        "loc": "Bethesda",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "09/12",
+        "val": 349
+      },
+      {
+        "n": "Shannon Thompson",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "09/09",
+        "val": 329
+      },
+      {
+        "n": "Danielle Weiss",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "09/07",
+        "val": 329
+      },
+      {
+        "n": "Sandra Wright",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/12",
+        "val": 299
+      },
+      {
+        "n": "Joseph Swann",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/11",
+        "val": 299
+      },
+      {
+        "n": "T.Pope Pope",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/08",
+        "val": 299
+      },
+      {
+        "n": "Candice Thompson",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/07",
+        "val": 299
+      },
+      {
+        "n": "Sacoyia Todd",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/07",
+        "val": 299
+      },
+      {
+        "n": "Valencia Bush",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/11",
+        "val": 299
+      },
+      {
+        "n": "Mukul Nerurkar",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/10",
+        "val": 299
+      },
+      {
+        "n": "Kerry Ann Nakouye",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/07",
+        "val": 299
+      },
+      {
+        "n": "Monica Hayes",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/07",
+        "val": 299
+      },
+      {
+        "n": "Toniere Lee",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/10",
+        "val": 279
+      },
+      {
+        "n": "Dana Plummer",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/12",
+        "val": 229
+      },
+      {
+        "n": "Crystal Smith",
+        "loc": "Bethesda",
+        "plan": "OLD 2- 30 min stretch visits monthly",
+        "type": "rec",
+        "date": "09/12",
+        "val": 209
       }
     ],
-    "narrative": {
-      "tagline": "Revenue up 49% week-over-week ($23630.43 total). New clients: 18 combined.",
-      "watches": [
-        "LLM narrative unavailable: Unexpected end of JSON input"
-      ]
-    },
-    "generatedAt": "2026-09-13T14:39:09.105Z"
+    "meta": {
+      "generatedAt": "2026-09-13T15:21:37.898Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": false,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0"
+      }
+    }
   }
 ]
