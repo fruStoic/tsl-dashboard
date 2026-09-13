@@ -2752,6 +2752,9 @@ renderAll();
     const sorted = autoWeeks.slice().sort((a, b) => b.id.localeCompare(a.id));
 
     sorted.forEach(function(autoWk) {
+      // Skip seed entries — they exist only for n8n's waterfall chaining, not display
+      if (autoWk.isSeed) return;
+
       // Skip if a curated week already covers the same date range
       const shortLabel = autoWk.shortLabel || autoWk.label || autoWk.id;
       const alreadyExists = Object.values(WEEKS).some(function(w) {
@@ -2765,9 +2768,10 @@ renderAll();
       injectAutoWeekIntoSidebar(key, autoWk);
     });
 
-    // After merging, auto-load the most recent auto-week so the page
+    // After merging, auto-load the most recent non-seed auto-week so the page
     // defaults to what's freshest rather than the last hand-curated week.
     for (let i = 0; i < sorted.length; i++) {
+      if (sorted[i].isSeed) continue;
       const key = 'auto_' + sorted[i].id;
       if (WEEKS[key]) {
         loadWeek(key);
