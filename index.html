@@ -2667,28 +2667,39 @@ renderAll();
     const weeks = await res.json();
     if (!Array.isArray(weeks) || weeks.length === 0) throw new Error('No weeks in file');
 
-    // Take the most recent by id (they are YYYY-MM-DD strings, sort lexicographically)
+    // Take the most recent by id
     const latest = weeks.slice().sort((a, b) => b.id.localeCompare(a.id))[0];
-    const tv = latest.combined && latest.combined.tv;
+
+    // Defensive field extraction — some fields may be missing in older shapes;
+    // compute from loc when possible, fall back to 0
+    const combined = latest.combined || {};
+    const loc = latest.loc || {};
+    const L = loc.lanham || {};
+    const B = loc.bethesda || {};
+    const tv = combined.tv != null ? combined.tv : (latest.totalValC || (L.tv || 0) + (B.tv || 0));
+    const nc = combined.nc != null ? combined.nc : ((L.nc || 0) + (B.nc || 0));
     const mtd = latest.mtd || {};
     const wow = latest.wow || {};
-    const nc = latest.combined && latest.combined.nc;
+    const narrative = latest.narrative || {};
+    const providersCount = latest.providersCount != null
+      ? latest.providersCount
+      : (Array.isArray(latest.providers) ? latest.providers.length : 0);
 
-    // Format helpers
     const $money = (n) => '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
     const dateFmt = (isoStr) => {
       const d = new Date(isoStr);
       return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
-    // Populate elements
-    document.getElementById('lb-week').textContent = latest.label || latest.id;
+    document.getElementById('lb-week').textContent = latest.label || latest.shortLabel || latest.id;
     document.getElementById('lb-tv').textContent = $money(tv);
 
     // Delta pill
     const dEl = document.getElementById('lb-delta');
-    const dPct = wow.tvPct || 0;
-    if (dPct > 0) {
+    const dPct = wow.tvPct;
+    if (dPct == null) {
+      dEl.style.display = 'none';
+    } else if (dPct > 0) {
       dEl.className = 'lb-delta up';
       dEl.textContent = '▲ +' + dPct + '% WoW';
     } else if (dPct < 0) {
@@ -2699,29 +2710,27 @@ renderAll();
       dEl.textContent = 'Flat WoW';
     }
 
-    // Meta line
-    document.getElementById('lb-meta').innerHTML =
-      'MTD <strong>' + $money(mtd.tv) + '</strong>' +
-      '<span>Memberships MTD <strong>' + $money(mtd.membership) + '</strong></span>' +
-      '<span>New clients <strong>' + (nc || 0) + '</strong></span>' +
-      '<span>Providers <strong>' + (latest.providers ? latest.providers.length : 0) + '</strong></span>';
+    // Meta line — only show fields we actually have
+    const metaParts = [];
+    if (mtd.tv != null) metaParts.push('MTD <strong>' + $money(mtd.tv) + '</strong>');
+    if (mtd.membership != null) metaParts.push('<span>Memberships MTD <strong>' + $money(mtd.membership) + '</strong></span>');
+    if (nc) metaParts.push('<span>New clients <strong>' + nc + '</strong></span>');
+    if (providersCount) metaParts.push('<span>Providers <strong>' + providersCount + '</strong></span>');
+    document.getElementById('lb-meta').innerHTML = metaParts.join('');
 
-    // Tagline (chief-of-staff narrative from Claude)
-    if (latest.narrative && latest.narrative.tagline) {
-      document.getElementById('lb-tagline').textContent = latest.narrative.tagline;
+    // Tagline
+    if (narrative && narrative.tagline) {
+      document.getElementById('lb-tagline').textContent = narrative.tagline;
     } else {
       document.getElementById('lb-tagline').style.display = 'none';
     }
 
     // Timestamp
-    if (latest.generatedAt) {
-      document.getElementById('lb-timestamp').textContent = 'Updated ' + dateFmt(latest.generatedAt);
-    }
+    const gen = (latest.meta && latest.meta.generatedAt) || latest.generatedAt;
+    if (gen) document.getElementById('lb-timestamp').textContent = 'Updated ' + dateFmt(gen);
 
-    // Reveal
     document.getElementById('liveBanner').classList.add('show');
   } catch (err) {
-    // Silent fail — banner stays hidden, rest of dashboard renders normally
     console.warn('Live banner unavailable:', err && err.message);
   }
 })();
@@ -2755,6 +2764,16 @@ renderAll();
       WEEKS[key] = autoWk;
       injectAutoWeekIntoSidebar(key, autoWk);
     });
+
+    // After merging, auto-load the most recent auto-week so the page
+    // defaults to what's freshest rather than the last hand-curated week.
+    for (let i = 0; i < sorted.length; i++) {
+      const key = 'auto_' + sorted[i].id;
+      if (WEEKS[key]) {
+        loadWeek(key);
+        break;
+      }
+    }
   } catch (err) {
     console.warn('Auto-week merge failed:', err && err.message);
   }
