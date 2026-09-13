@@ -115,6 +115,24 @@ body.view-combined .sw-btn[data-v="combined"]{ background:rgba(255,255,255,.15);
 .alert { background:#FAEEDA; border:1px solid #DDE1E4; border-radius:0; padding:10px 16px; font-size:11px; color:#633806; line-height:1.6; margin-bottom:18px; }
 .alert strong { font-weight:700; }
 
+/* LIVE BANNER — fetches weeks.json from GitHub, shows freshest week */
+.live-banner { background:#111111; color:#F2F2F2; padding:18px 22px; margin-bottom:18px; border-left:4px solid #BBC4CB; display:none; }
+.live-banner.show { display:block; }
+.live-banner .lb-tag { font-family:'Oswald',sans-serif; font-size:10px; letter-spacing:3px; color:#BBC4CB; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.live-banner .lb-dot { width:6px; height:6px; background:#BBC4CB; border-radius:50%; display:inline-block; animation:lbpulse 2s ease-in-out infinite; }
+@keyframes lbpulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+.live-banner .lb-headline { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+.live-banner .lb-week { font-family:'Oswald',sans-serif; font-size:20px; font-weight:500; letter-spacing:1px; color:#FFFFFF; text-transform:uppercase; }
+.live-banner .lb-tv { font-family:'Oswald',sans-serif; font-size:28px; font-weight:700; color:#FFFFFF; }
+.live-banner .lb-delta { font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:1px; padding:3px 8px; text-transform:uppercase; }
+.live-banner .lb-delta.up { background:rgba(39,80,10,0.4); color:#8ADB8A; }
+.live-banner .lb-delta.down { background:rgba(163,45,45,0.4); color:#FF8A8A; }
+.live-banner .lb-delta.flat { background:rgba(255,255,255,0.15); color:#BBC4CB; }
+.live-banner .lb-meta { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:14px; font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.6); }
+.live-banner .lb-meta strong { color:#FFFFFF; font-weight:500; margin-left:4px; }
+.live-banner .lb-tagline { font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.55; color:rgba(255,255,255,0.85); border-top:1px solid rgba(255,255,255,0.1); padding-top:12px; }
+.live-banner .lb-timestamp { font-family:'Oswald',sans-serif; font-size:9px; letter-spacing:1.5px; color:rgba(255,255,255,0.35); margin-top:10px; text-transform:uppercase; }
+
 /* ── HERO ── */
 .hero-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
 .hero-card { background:var(--surface); border-radius:0; padding:18px 20px; border:1px solid var(--border); position:relative; overflow:hidden; }
@@ -695,6 +713,19 @@ body.view-combined { --accent-lt:#F8F8F8; }
   <!-- MAIN -->
   <div class="main">
   <div class="page" id="mainPage">
+
+  <!-- LIVE BANNER (auto-fetched from weeks.json) -->
+  <div class="live-banner" id="liveBanner">
+    <div class="lb-tag"><span class="lb-dot"></span><span>Live · Auto-updated from Zenoti</span></div>
+    <div class="lb-headline">
+      <span class="lb-week" id="lb-week"></span>
+      <span class="lb-tv" id="lb-tv"></span>
+      <span class="lb-delta" id="lb-delta"></span>
+    </div>
+    <div class="lb-meta" id="lb-meta"></div>
+    <div class="lb-tagline" id="lb-tagline"></div>
+    <div class="lb-timestamp" id="lb-timestamp"></div>
+  </div>
 
   <!-- ALERT (dynamic) -->
   <div id="weeklySection">
@@ -2623,6 +2654,77 @@ function mrow(label,l,b,c){return `<tr><td>${label}</td><td class="col-L">${l}</
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 renderAll();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LIVE BANNER — fetches weeks.json from GitHub (updated weekly by n8n)
+// ═══════════════════════════════════════════════════════════════════════════
+(async function loadLiveBanner() {
+  const WEEKS_JSON_URL = 'https://raw.githubusercontent.com/frustoic/tsl-dashboard/main/weeks.json';
+  try {
+    // Cache-bust so we always see the freshest push
+    const res = await fetch(WEEKS_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const weeks = await res.json();
+    if (!Array.isArray(weeks) || weeks.length === 0) throw new Error('No weeks in file');
+
+    // Take the most recent by id (they are YYYY-MM-DD strings, sort lexicographically)
+    const latest = weeks.slice().sort((a, b) => b.id.localeCompare(a.id))[0];
+    const tv = latest.combined && latest.combined.tv;
+    const mtd = latest.mtd || {};
+    const wow = latest.wow || {};
+    const nc = latest.combined && latest.combined.nc;
+
+    // Format helpers
+    const $money = (n) => '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+    const dateFmt = (isoStr) => {
+      const d = new Date(isoStr);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    // Populate elements
+    document.getElementById('lb-week').textContent = latest.label || latest.id;
+    document.getElementById('lb-tv').textContent = $money(tv);
+
+    // Delta pill
+    const dEl = document.getElementById('lb-delta');
+    const dPct = wow.tvPct || 0;
+    if (dPct > 0) {
+      dEl.className = 'lb-delta up';
+      dEl.textContent = '▲ +' + dPct + '% WoW';
+    } else if (dPct < 0) {
+      dEl.className = 'lb-delta down';
+      dEl.textContent = '▼ ' + dPct + '% WoW';
+    } else {
+      dEl.className = 'lb-delta flat';
+      dEl.textContent = 'Flat WoW';
+    }
+
+    // Meta line
+    document.getElementById('lb-meta').innerHTML =
+      'MTD <strong>' + $money(mtd.tv) + '</strong>' +
+      '<span>Memberships MTD <strong>' + $money(mtd.membership) + '</strong></span>' +
+      '<span>New clients <strong>' + (nc || 0) + '</strong></span>' +
+      '<span>Providers <strong>' + (latest.providers ? latest.providers.length : 0) + '</strong></span>';
+
+    // Tagline (chief-of-staff narrative from Claude)
+    if (latest.narrative && latest.narrative.tagline) {
+      document.getElementById('lb-tagline').textContent = latest.narrative.tagline;
+    } else {
+      document.getElementById('lb-tagline').style.display = 'none';
+    }
+
+    // Timestamp
+    if (latest.generatedAt) {
+      document.getElementById('lb-timestamp').textContent = 'Updated ' + dateFmt(latest.generatedAt);
+    }
+
+    // Reveal
+    document.getElementById('liveBanner').classList.add('show');
+  } catch (err) {
+    // Silent fail — banner stays hidden, rest of dashboard renders normally
+    console.warn('Live banner unavailable:', err && err.message);
+  }
+})();
 </script>
 </body>
 </html>
