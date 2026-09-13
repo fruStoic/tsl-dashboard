@@ -42,8 +42,7 @@
           "Ben The Baptist ": 1
         },
         "bsrc": {
-          "1": 14,
-          "-1": 68
+          "Zenoti": 94
         },
         "ml": {
           "open": 0,
@@ -91,8 +90,7 @@
           "Other": 9
         },
         "bsrc": {
-          "1": 3,
-          "-1": 22
+          "Zenoti": 26
         },
         "ml": {
           "open": 0,
@@ -272,8 +270,94 @@
         "val": 209
       }
     ],
+    "combined": {
+      "tv": 23630.43,
+      "rev": 11133.66,
+      "nc": 18,
+      "invC": 120,
+      "apptC": 113,
+      "cancelled": 0,
+      "noshow": 0,
+      "service": 11133.66,
+      "product": 1173.77,
+      "membership": 6660,
+      "packageRev": 3660
+    },
+    "mtd": {
+      "tv": 40297.41,
+      "service": 19484.16,
+      "membership": 13198,
+      "packageRev": 4159,
+      "invC": 227
+    },
+    "wow": {
+      "tv": 7720.81,
+      "tvPct": 49,
+      "service": 3068.16,
+      "servicePct": 38,
+      "nc": 3,
+      "invC": 14,
+      "membership": 480
+    },
+    "narrative": {
+      "tagline": "Revenue up 49% WoW ($23630.43). New clients: 18 combined.",
+      "watches": [
+        "LLM narrative unavailable: Unexpected end of JSON input"
+      ]
+    },
+    "providersCount": 13,
+    "newEFTs": [
+      {
+        "n": "Tarah Massey",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "new",
+        "date": "09/11",
+        "val": 599
+      },
+      {
+        "n": "Jennifer Maquez",
+        "loc": "Bethesda",
+        "plan": "FAMILY FLEX",
+        "type": "new",
+        "date": "09/12",
+        "val": 599
+      },
+      {
+        "n": "Carolyn Parker",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "09/11",
+        "val": 349
+      },
+      {
+        "n": "Marcella Gutierrez",
+        "loc": "Bethesda",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "09/12",
+        "val": 349
+      },
+      {
+        "n": "Shannon Thompson",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "09/09",
+        "val": 329
+      },
+      {
+        "n": "Danielle Weiss",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "09/07",
+        "val": 329
+      }
+    ],
     "meta": {
-      "generatedAt": "2026-09-13T15:21:37.898Z",
+      "generatedAt": "2026-09-13T15:37:06.551Z",
       "narrativeSource": "claude-sonnet-5",
       "priorWeekChained": false,
       "notes": {
