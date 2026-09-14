@@ -48,7 +48,7 @@
     "shortLabel": "Sep 7 - Sep 13",
     "totalValC": 23630,
     "isAuto": true,
-    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue up 49% WoW ($23630.43). New clients: 18 combined.",
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Total revenue hit $23,630, up 49% WoW, driven by Lanham's 14 new clients and TV growth from $12,696 to $18,723. Bethesda grew in parallel but stays smaller in absolute terms (TV $4,908, 4 new clients).<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Nigel Johnson booked 19 hrs at Lanham but rebook sits at 14% - high volume, low retention signal worth a conversation.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Online booking is 0% at both locations - all 18 new clients and all invoices are coming through non-digital channels.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Discounts totaled $2,679 against $23,630 in revenue (~11%) - track whether this is tied to the new EFT membership push or becoming a standing practice.</span>",
     "loc": {
       "lanham": {
         "tv": 18722.74,
@@ -343,9 +343,11 @@
       "membership": 480
     },
     "narrative": {
-      "tagline": "Revenue up 49% WoW ($23630.43). New clients: 18 combined.",
+      "tagline": "Total revenue hit $23,630, up 49% WoW, driven by Lanham's 14 new clients and TV growth from $12,696 to $18,723. Bethesda grew in parallel but stays smaller in absolute terms (TV $4,908, 4 new clients).",
       "watches": [
-        "LLM narrative unavailable: Unexpected end of JSON input"
+        "Nigel Johnson booked 19 hrs at Lanham but rebook sits at 14% - high volume, low retention signal worth a conversation.",
+        "Online booking is 0% at both locations - all 18 new clients and all invoices are coming through non-digital channels.",
+        "Discounts totaled $2,679 against $23,630 in revenue (~11%) - track whether this is tied to the new EFT membership push or becoming a standing practice."
       ]
     },
     "providersCount": 13,
@@ -400,7 +402,7 @@
       }
     ],
     "meta": {
-      "generatedAt": "2026-09-13T18:43:37.673Z",
+      "generatedAt": "2026-09-14T01:43:07.000Z",
       "narrativeSource": "claude-sonnet-5",
       "priorWeekChained": true,
       "notes": {
