@@ -48,7 +48,7 @@
     "shortLabel": "Sep 7 - Sep 13",
     "totalValC": 23630,
     "isAuto": true,
-    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Total revenue hit $23,630, up 49% WoW, driven by Lanham's 14 new clients and TV growth from $12,696 to $18,723. Bethesda grew in parallel but stays smaller in absolute terms (TV $4,908, 4 new clients).<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Nigel Johnson booked 19 hrs at Lanham but rebook sits at 14% - high volume, low retention signal worth a conversation.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Online booking is 0% at both locations - all 18 new clients and all invoices are coming through non-digital channels.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Discounts totaled $2,679 against $23,630 in revenue (~11%) - track whether this is tied to the new EFT membership push or becoming a standing practice.</span>",
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Total revenue jumped to $23,630 (+49% WoW), driven by Lanham's $18,723 in value (up from $12,696) and 14 new clients against zero cancellations or no-shows across both locations.<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Nigel Johnson logged 19 booked hours at Lanham but only a 14% rebook rate — second-highest volume provider with weak client retention, worth a conversation before hours are backfilled.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Discounts hit $2,679 this week, roughly 11% of total value — track whether this becomes a standing offer or reverts next week.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Bethesda's rebook rate (32%) and productivity (19%) continue to trail Lanham (39%, 26%) despite similar new-client volume per invoice count — worth checking staffing mix or provider assignment at that location.</span>",
     "loc": {
       "lanham": {
         "tv": 18722.74,
@@ -343,11 +343,11 @@
       "membership": 480
     },
     "narrative": {
-      "tagline": "Total revenue hit $23,630, up 49% WoW, driven by Lanham's 14 new clients and TV growth from $12,696 to $18,723. Bethesda grew in parallel but stays smaller in absolute terms (TV $4,908, 4 new clients).",
+      "tagline": "Total revenue jumped to $23,630 (+49% WoW), driven by Lanham's $18,723 in value (up from $12,696) and 14 new clients against zero cancellations or no-shows across both locations.",
       "watches": [
-        "Nigel Johnson booked 19 hrs at Lanham but rebook sits at 14% - high volume, low retention signal worth a conversation.",
-        "Online booking is 0% at both locations - all 18 new clients and all invoices are coming through non-digital channels.",
-        "Discounts totaled $2,679 against $23,630 in revenue (~11%) - track whether this is tied to the new EFT membership push or becoming a standing practice."
+        "Nigel Johnson logged 19 booked hours at Lanham but only a 14% rebook rate — second-highest volume provider with weak client retention, worth a conversation before hours are backfilled.",
+        "Discounts hit $2,679 this week, roughly 11% of total value — track whether this becomes a standing offer or reverts next week.",
+        "Bethesda's rebook rate (32%) and productivity (19%) continue to trail Lanham (39%, 26%) despite similar new-client volume per invoice count — worth checking staffing mix or provider assignment at that location."
       ]
     },
     "providersCount": 13,
@@ -402,7 +402,7 @@
       }
     ],
     "meta": {
-      "generatedAt": "2026-09-14T01:43:07.000Z",
+      "generatedAt": "2026-09-14T01:48:28.464Z",
       "narrativeSource": "claude-sonnet-5",
       "priorWeekChained": true,
       "notes": {
