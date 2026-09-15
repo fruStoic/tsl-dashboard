@@ -48,65 +48,65 @@
     "shortLabel": "Sep 7 - Sep 13",
     "totalValC": 25677,
     "isAuto": true,
-    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Total revenue hit $23,630.43 this week (+49% WoW), driven by Lanham's $18,722.74 (+47%) on 14 new clients and 94 invoices; six new EFT memberships added $2,554 in recurring revenue.<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Nigel Johnson booked 19 hrs at Lanham but rebook rate is 14% - high volume, low conversion on future visits.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Discounts totaled $2,679 (11% of total revenue) - confirm this aligns with planned promos, not ad hoc discounting.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Online booking is 0% at both locations - check if this is a system/tracking gap or true client behavior.</span>",
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Weekly revenue jumped 44% to $25,677 (from $17,781), driven by Lanham's TV rising to $20,455 and 20 new clients booked studio-wide with zero cancellations or no-shows.<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Nigel Johnson booked 19 hrs at Lanham but rebooks only 14% of clients — high utilization with weak conversion, worth a provider check-in.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Three providers (Muwwakkil, Wang, Atanga) logged 2-2.5 hrs each at 0% rebook — near-idle capacity across both locations.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Online booking sits at 0% for both locations; all 20 new clients this week came through non-digital channels.</span>",
     "loc": {
       "lanham": {
         "tv": 20455.57,
-        "rev": 9587.66,
-        "prod": 26,
-        "rb": 39,
+        "rev": 10354.41,
+        "prod": 29,
+        "rb": 41.1,
         "nc": 16,
         "neft": "2/$948",
         "neftC": 2,
         "neftV": 948,
-        "reft": 2701,
+        "reft": 3578,
         "mcan": 0,
-        "ret": 1161.08,
-        "tkt": 135,
+        "ret": 1180.16,
+        "tkt": 134,
         "onl": 0,
-        "ug": 79,
-        "disc": 2198,
+        "ug": 85,
+        "disc": 2407,
         "pr": 0,
         "invC": 105,
-        "rebC": 32,
+        "rebC": 37,
         "revCats": [
-          9588,
-          3649,
+          10354,
+          4526,
           3660,
-          1161
+          1180
         ],
         "svc": {
-          "Stretch @ The Loft": 45,
+          "Stretch @ The Loft": 50,
           "Enhancements": 6,
-          "Other": 14,
+          "Other": 15,
           "Massage @ The Loft": 1,
-          "New Client Stretch": 14,
+          "New Client Stretch": 16,
           "Dr Akmal": 1,
           "Ben The Baptist ": 1
         },
         "bsrc": {
-          "Zenoti": 94
+          "Zenoti": 105
         },
         "ml": {
           "open": 61098,
-          "sold": 3649,
-          "red": 2548,
+          "sold": 4526,
+          "red": 3090,
           "can": 0,
-          "close": 62199
+          "close": 62534
         },
         "pl": {
           "open": 20070,
           "sold": 3660,
-          "red": 2556,
+          "red": 2499,
           "exp": 0,
-          "close": 21174
+          "close": 21231
         }
       },
       "bethesda": {
         "tv": 5221.69,
-        "rev": 1546,
-        "prod": 19,
-        "rb": 32,
+        "rev": 1860,
+        "prod": 22,
+        "rb": 37.9,
         "nc": 4,
         "neft": "4/$1,606",
         "neftC": 4,
@@ -114,33 +114,33 @@
         "reft": 1405,
         "mcan": 0,
         "ret": 12.69,
-        "tkt": 141,
+        "tkt": 143,
         "onl": 0,
-        "ug": 22,
-        "disc": 481,
+        "ug": 23,
+        "disc": 605,
         "pr": 0,
         "invC": 28,
-        "rebC": 8,
+        "rebC": 11,
         "revCats": [
-          1546,
+          1860,
           3011,
           0,
           13
         ],
         "svc": {
           "New Client Stretch": 6,
-          "Stretch @ The Loft": 10,
-          "Other": 9
+          "Stretch @ The Loft": 13,
+          "Other": 10
         },
         "bsrc": {
-          "Zenoti": 26
+          "Zenoti": 28
         },
         "ml": {
           "open": 37150,
           "sold": 3011,
-          "red": 1158,
+          "red": 1472,
           "can": 0,
-          "close": 39003
+          "close": 38689
         },
         "pl": {
           "open": 20728,
@@ -217,6 +217,22 @@
         "val": 329
       },
       {
+        "n": "Natalia Zackery",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/13",
+        "val": 299
+      },
+      {
+        "n": "Matthew Johnson",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/13",
+        "val": 299
+      },
+      {
         "n": "Sandra Wright",
         "loc": "Lanham",
         "plan": "NEW Flex Plan 2x Month Membership",
@@ -289,6 +305,14 @@
         "val": 299
       },
       {
+        "n": "Keely Walston",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/13",
+        "val": 279
+      },
+      {
         "n": "Toniere Lee",
         "loc": "Lanham",
         "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
@@ -315,40 +339,39 @@
     ],
     "combined": {
       "tv": 25677.26,
-      "rev": 11133.66,
+      "rev": 12214.41,
       "nc": 20,
       "invC": 133,
-      "apptC": 113,
+      "apptC": 126,
       "cancelled": 0,
       "noshow": 0,
       "service": 12214.41,
       "product": 1192.85,
-      "membership": 7595,
-      "packageRev": 3660,
-      "discount": 3011.59
+      "membership": 7537,
+      "packageRev": 3660
     },
     "mtd": {
-      "tv": 40297.41,
-      "service": 19484.16,
-      "membership": 13198,
+      "tv": 42344.24,
+      "service": 20564.91,
+      "membership": 14075,
       "packageRev": 4159,
-      "invC": 227
+      "invC": 240
     },
     "wow": {
-      "tv": 7720.81,
-      "tvPct": 49,
-      "service": 3068.16,
-      "servicePct": 38,
-      "nc": 3,
-      "invC": 14,
-      "membership": 480
+      "tv": 7896.14,
+      "tvPct": 44,
+      "service": 2911.41,
+      "servicePct": 31,
+      "nc": 5,
+      "invC": 17,
+      "membership": 758
     },
     "narrative": {
-      "tagline": "Total revenue hit $23,630.43 this week (+49% WoW), driven by Lanham's $18,722.74 (+47%) on 14 new clients and 94 invoices; six new EFT memberships added $2,554 in recurring revenue.",
+      "tagline": "Weekly revenue jumped 44% to $25,677 (from $17,781), driven by Lanham's TV rising to $20,455 and 20 new clients booked studio-wide with zero cancellations or no-shows.",
       "watches": [
-        "Nigel Johnson booked 19 hrs at Lanham but rebook rate is 14% - high volume, low conversion on future visits.",
-        "Discounts totaled $2,679 (11% of total revenue) - confirm this aligns with planned promos, not ad hoc discounting.",
-        "Online booking is 0% at both locations - check if this is a system/tracking gap or true client behavior."
+        "Nigel Johnson booked 19 hrs at Lanham but rebooks only 14% of clients — high utilization with weak conversion, worth a provider check-in.",
+        "Three providers (Muwwakkil, Wang, Atanga) logged 2-2.5 hrs each at 0% rebook — near-idle capacity across both locations.",
+        "Online booking sits at 0% for both locations; all 20 new clients this week came through non-digital channels."
       ]
     },
     "providersCount": 13,
@@ -403,7 +426,7 @@
       }
     ],
     "meta": {
-      "generatedAt": "2026-09-14T03:55:14.103Z",
+      "generatedAt": "2026-09-15T13:20:39.974Z",
       "narrativeSource": "claude-sonnet-5",
       "priorWeekChained": true,
       "notes": {
