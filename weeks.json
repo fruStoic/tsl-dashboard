@@ -439,9 +439,9 @@
     "id": "2026-09-14",
     "label": "Sep 14 - Sep 20, 2026",
     "shortLabel": "Sep 14 - Sep 20",
-    "totalValC": 19841,
+    "totalValC": 19876,
     "isAuto": true,
-    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue down 23% WoW ($19841.12). New clients: 20 combined.",
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue down 23% WoW ($19876.12). New clients: 20 combined.",
     "loc": {
       "lanham": {
         "tv": 16126.18,
@@ -494,7 +494,7 @@
         }
       },
       "bethesda": {
-        "tv": 3714.94,
+        "tv": 3749.94,
         "rev": 1767,
         "prod": 46,
         "rb": 31,
@@ -507,10 +507,10 @@
         "ret": 104.94,
         "tkt": 147,
         "onl": 0,
-        "ug": 17,
+        "ug": 18,
         "disc": 575,
         "pr": 0,
-        "invC": 21,
+        "invC": 22,
         "rebC": 9,
         "revCats": [
           1767,
@@ -524,7 +524,7 @@
           "New Client Stretch": 4
         },
         "bsrc": {
-          "Zenoti": 21
+          "Zenoti": 22
         },
         "ml": {
           "open": 38689,
@@ -697,10 +697,10 @@
       }
     ],
     "combined": {
-      "tv": 19841.12,
+      "tv": 19876.12,
       "rev": 11081.24,
       "nc": 20,
-      "invC": 126,
+      "invC": 127,
       "apptC": 126,
       "cancelled": 0,
       "noshow": 0,
@@ -714,25 +714,25 @@
       "pkgV": 2099
     },
     "mtd": {
-      "tv": 62185.36,
+      "tv": 62220.36,
       "service": 31646.15,
       "membership": 19568,
       "packageRev": 6258,
-      "invC": 366
+      "invC": 367
     },
     "wow": {
-      "tv": -5836.14,
+      "tv": -5801.14,
       "tvPct": -23,
       "service": -1133.17,
       "servicePct": -9,
       "nc": 0,
-      "invC": -7,
+      "invC": -6,
       "membership": -1466
     },
     "narrative": {
-      "tagline": "Revenue down 23% WoW ($19841.12). New clients: 20 combined.",
+      "tagline": "Revenue down 23% WoW ($19876.12). New clients: 20 combined.",
       "watches": [
-        "LLM narrative unavailable: Unterminated string in JSON at position 530 (line 5 column 94)"
+        "LLM narrative unavailable: Expected property name or '}' in JSON at position 1 (line 1 column 2)"
       ]
     },
     "providersCount": 11,
@@ -755,7 +755,7 @@
       }
     ],
     "meta": {
-      "generatedAt": "2026-09-21T02:27:05.034Z",
+      "generatedAt": "2026-09-21T03:55:17.222Z",
       "narrativeSource": "claude-sonnet-5",
       "priorWeekChained": true,
       "notes": {
