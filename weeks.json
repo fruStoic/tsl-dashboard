@@ -434,5 +434,334 @@
         "pl_exp": "package expirations not derived from sales endpoint — set to 0"
       }
     }
+  },
+  {
+    "id": "2026-09-14",
+    "label": "Sep 14 - Sep 20, 2026",
+    "shortLabel": "Sep 14 - Sep 20",
+    "totalValC": 19841,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue down 23% WoW ($19841.12). New clients: 20 combined.",
+    "loc": {
+      "lanham": {
+        "tv": 16126.18,
+        "rev": 9314.24,
+        "prod": 28,
+        "rb": 30,
+        "nc": 17,
+        "neft": "2/$1,198",
+        "neftC": 2,
+        "neftV": 1198,
+        "reft": 3100,
+        "mcan": 0,
+        "ret": 362.94,
+        "tkt": 128,
+        "onl": 0,
+        "ug": 81,
+        "disc": 2402,
+        "pr": 0,
+        "invC": 105,
+        "rebC": 27,
+        "revCats": [
+          9314,
+          4298,
+          2099,
+          363
+        ],
+        "svc": {
+          "Other": 19,
+          "Stretch @ The Loft": 47,
+          "Enhancements": 3,
+          "New Client Stretch": 19,
+          "Premium Services": 2
+        },
+        "bsrc": {
+          "Zenoti": 105
+        },
+        "ml": {
+          "open": 62534,
+          "sold": 4298,
+          "red": 3941,
+          "can": 0,
+          "close": 62891
+        },
+        "pl": {
+          "open": 21231,
+          "sold": 2099,
+          "red": 1925,
+          "exp": 0,
+          "close": 21405
+        }
+      },
+      "bethesda": {
+        "tv": 3714.94,
+        "rev": 1767,
+        "prod": 46,
+        "rb": 31,
+        "nc": 3,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 1773,
+        "mcan": 0,
+        "ret": 104.94,
+        "tkt": 147,
+        "onl": 0,
+        "ug": 17,
+        "disc": 575,
+        "pr": 0,
+        "invC": 21,
+        "rebC": 9,
+        "revCats": [
+          1767,
+          1773,
+          0,
+          105
+        ],
+        "svc": {
+          "Other": 15,
+          "Stretch @ The Loft": 10,
+          "New Client Stretch": 4
+        },
+        "bsrc": {
+          "Zenoti": 21
+        },
+        "ml": {
+          "open": 38689,
+          "sold": 1773,
+          "red": 1491,
+          "can": 0,
+          "close": 38971
+        },
+        "pl": {
+          "open": 20728,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 20728
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Shawn Perkins",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "new",
+        "date": "09/20",
+        "val": 599
+      },
+      {
+        "n": "Oliver Wendall Butler",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "new",
+        "date": "09/19",
+        "val": 599
+      },
+      {
+        "n": "Raykyle Highsmith",
+        "loc": "Bethesda",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/14",
+        "val": 320
+      },
+      {
+        "n": "Barbara Bazron",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/19",
+        "val": 299
+      },
+      {
+        "n": "Velesha Burke",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/18",
+        "val": 299
+      },
+      {
+        "n": "Anthony Webb",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/15",
+        "val": 299
+      },
+      {
+        "n": "Marlen Giles",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/14",
+        "val": 299
+      },
+      {
+        "n": "Dena Robinson",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/20",
+        "val": 299
+      },
+      {
+        "n": "Christopher Coyne",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/14",
+        "val": 299
+      },
+      {
+        "n": "LeRoy Dock",
+        "loc": "Bethesda",
+        "plan": "OLD 4 - 30 minute stretch visits monthly",
+        "type": "rec",
+        "date": "09/15",
+        "val": 297
+      },
+      {
+        "n": "Doris Cook",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/18",
+        "val": 279
+      },
+      {
+        "n": "Marva Parker",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/17",
+        "val": 279
+      },
+      {
+        "n": "Crystal Eubanks",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/14",
+        "val": 279
+      },
+      {
+        "n": "Ronald Taylor",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/14",
+        "val": 279
+      },
+      {
+        "n": "Vianka Hardy",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/14",
+        "val": 279
+      },
+      {
+        "n": "Stacey Dixon",
+        "loc": "Bethesda",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/14",
+        "val": 279
+      },
+      {
+        "n": "Stacey Dixon",
+        "loc": "Bethesda",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/14",
+        "val": 279
+      },
+      {
+        "n": "Steve Walker",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/19",
+        "val": 260
+      },
+      {
+        "n": "Jamal Blackwell",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/14",
+        "val": 249
+      }
+    ],
+    "combined": {
+      "tv": 19841.12,
+      "rev": 11081.24,
+      "nc": 20,
+      "invC": 126,
+      "apptC": 126,
+      "cancelled": 0,
+      "noshow": 0,
+      "service": 11081.24,
+      "product": 467.88,
+      "membership": 6071,
+      "packageRev": 2099,
+      "reftC": 0,
+      "reft": 4873,
+      "pkgC": 4,
+      "pkgV": 2099
+    },
+    "mtd": {
+      "tv": 62185.36,
+      "service": 31646.15,
+      "membership": 19568,
+      "packageRev": 6258,
+      "invC": 366
+    },
+    "wow": {
+      "tv": -5836.14,
+      "tvPct": -23,
+      "service": -1133.17,
+      "servicePct": -9,
+      "nc": 0,
+      "invC": -7,
+      "membership": -1466
+    },
+    "narrative": {
+      "tagline": "Revenue down 23% WoW ($19841.12). New clients: 20 combined.",
+      "watches": [
+        "LLM narrative unavailable: Unterminated string in JSON at position 530 (line 5 column 94)"
+      ]
+    },
+    "providersCount": 11,
+    "newEFTs": [
+      {
+        "n": "Shawn Perkins",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "new",
+        "date": "09/20",
+        "val": 599
+      },
+      {
+        "n": "Oliver Wendall Butler",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "new",
+        "date": "09/19",
+        "val": 599
+      }
+    ],
+    "meta": {
+      "generatedAt": "2026-09-21T02:27:05.034Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0"
+      }
+    }
   }
 ]
