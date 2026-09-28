@@ -763,5 +763,322 @@
         "pl_exp": "package expirations not derived from sales endpoint — set to 0"
       }
     }
+  },
+  {
+    "id": "2026-09-21",
+    "label": "Sep 21 - Sep 27, 2026",
+    "shortLabel": "Sep 21 - Sep 27",
+    "totalValC": 17884,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Total revenue fell 10% WoW to $17,883.55, driven by Bethesda's TV dropping 40% ($3,749.94 to $2,245.50) on just 1 new client and a 23.8% rebook rate. Service revenue held up (+3% WoW), but membership sales dropped $1,259 to $4,812.<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Bethesda rebook rate at 23.8% vs Lanham's 41.4% - only 1 new client booked there this week against 11 at Lanham.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Lawrence Coley logged the most hours (24.3) of any provider but rebooks only 25% of clients - highest-utilized seat, weakest retention.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Membership sales down 21% WoW ($6,071 to $4,812); redemptions at both locations ($5,194 Lanham, $1,112 Bethesda) continue to outpace new sales.</span>",
+    "loc": {
+      "lanham": {
+        "tv": 15638.05,
+        "rev": 9944.99,
+        "prod": 27,
+        "rb": 41.4,
+        "nc": 11,
+        "neft": "3/$1,007",
+        "neftC": 3,
+        "neftV": 1007,
+        "reft": 3229,
+        "mcan": 0,
+        "ret": 292.06,
+        "tkt": 146,
+        "onl": 0,
+        "ug": 87,
+        "disc": 1889,
+        "pr": 0,
+        "invC": 101,
+        "rebC": 36,
+        "revCats": [
+          9945,
+          4236,
+          580,
+          292
+        ],
+        "svc": {
+          "Other": 20,
+          "Stretch @ The Loft": 50,
+          "New Client Stretch": 12,
+          "Premium Services": 2,
+          "Enhancements": 2,
+          "Ben The Baptist ": 1
+        },
+        "bsrc": {
+          "Zenoti": 101
+        },
+        "ml": {
+          "open": 62891,
+          "sold": 4236,
+          "red": 5194,
+          "can": 0,
+          "close": 61933
+        },
+        "pl": {
+          "open": 21405,
+          "sold": 580,
+          "red": 711,
+          "exp": 0,
+          "close": 21274
+        }
+      },
+      "bethesda": {
+        "tv": 2245.5,
+        "rev": 1494.5,
+        "prod": 34,
+        "rb": 23.8,
+        "nc": 1,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 576,
+        "mcan": 0,
+        "ret": 0,
+        "tkt": 136,
+        "onl": 0,
+        "ug": 14,
+        "disc": 492,
+        "pr": 0,
+        "invC": 17,
+        "rebC": 5,
+        "revCats": [
+          1495,
+          576,
+          0,
+          0
+        ],
+        "svc": {
+          "Other": 11,
+          "Stretch @ The Loft": 8,
+          "Enhancements": 1,
+          "New Client Stretch": 1
+        },
+        "bsrc": {
+          "Zenoti": 17
+        },
+        "ml": {
+          "open": 38971,
+          "sold": 576,
+          "red": 1112,
+          "can": 0,
+          "close": 38435
+        },
+        "pl": {
+          "open": 20728,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 20728
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Lisa Charaf",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "09/25",
+        "val": 349
+      },
+      {
+        "n": "Donald Taylor",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "09/21",
+        "val": 349
+      },
+      {
+        "n": "Reshanda Adams Barnett",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "09/25",
+        "val": 329
+      },
+      {
+        "n": "Lelia Mejia",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "09/23",
+        "val": 329
+      },
+      {
+        "n": "Kevin Jackson",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/27",
+        "val": 299
+      },
+      {
+        "n": "Aaron Dixon",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/27",
+        "val": 299
+      },
+      {
+        "n": "Staci Burrough",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/26",
+        "val": 299
+      },
+      {
+        "n": "Chanza Baytop",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/26",
+        "val": 299
+      },
+      {
+        "n": "Heather Walker",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/26",
+        "val": 299
+      },
+      {
+        "n": "Natash Jones",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "09/22",
+        "val": 299
+      },
+      {
+        "n": "Sean Wilson",
+        "loc": "Bethesda",
+        "plan": "OLD 4 - 30 minute stretch visits monthly",
+        "type": "rec",
+        "date": "09/27",
+        "val": 297
+      },
+      {
+        "n": "Kandace Latson",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/27",
+        "val": 279
+      },
+      {
+        "n": "Dominique Pender",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/26",
+        "val": 279
+      },
+      {
+        "n": "Erika Washington",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/25",
+        "val": 279
+      },
+      {
+        "n": "Jimmy Jimmy Sanders",
+        "loc": "Bethesda",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/27",
+        "val": 279
+      },
+      {
+        "n": "Kelly Taylor",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "09/24",
+        "val": 249
+      }
+    ],
+    "combined": {
+      "tv": 17883.55,
+      "rev": 11439.49,
+      "nc": 12,
+      "invC": 118,
+      "apptC": 117,
+      "cancelled": 0,
+      "noshow": 0,
+      "service": 11439.49,
+      "product": 292.06,
+      "membership": 4812,
+      "packageRev": 580,
+      "reftC": 0,
+      "reft": 3805,
+      "pkgC": 1,
+      "pkgV": 580
+    },
+    "mtd": {
+      "tv": 80103.91,
+      "service": 43085.64,
+      "membership": 24081,
+      "packageRev": 6838,
+      "invC": 484
+    },
+    "wow": {
+      "tv": -1992.57,
+      "tvPct": -10,
+      "service": 358.25,
+      "servicePct": 3,
+      "nc": -8,
+      "invC": -9,
+      "membership": -1259
+    },
+    "narrative": {
+      "tagline": "Total revenue fell 10% WoW to $17,883.55, driven by Bethesda's TV dropping 40% ($3,749.94 to $2,245.50) on just 1 new client and a 23.8% rebook rate. Service revenue held up (+3% WoW), but membership sales dropped $1,259 to $4,812.",
+      "watches": [
+        "Bethesda rebook rate at 23.8% vs Lanham's 41.4% - only 1 new client booked there this week against 11 at Lanham.",
+        "Lawrence Coley logged the most hours (24.3) of any provider but rebooks only 25% of clients - highest-utilized seat, weakest retention.",
+        "Membership sales down 21% WoW ($6,071 to $4,812); redemptions at both locations ($5,194 Lanham, $1,112 Bethesda) continue to outpace new sales."
+      ]
+    },
+    "providersCount": 11,
+    "newEFTs": [
+      {
+        "n": "Lisa Charaf",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "09/25",
+        "val": 349
+      },
+      {
+        "n": "Reshanda Adams Barnett",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "09/25",
+        "val": 329
+      },
+      {
+        "n": "Lelia Mejia",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "09/23",
+        "val": 329
+      }
+    ],
+    "meta": {
+      "generatedAt": "2026-09-28T03:55:16.003Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0"
+      }
+    }
   }
 ]
