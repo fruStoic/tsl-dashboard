@@ -1465,5 +1465,353 @@
         "pl_exp": "package expirations not derived from sales endpoint — set to 0"
       }
     }
+  },
+  {
+    "id": "2026-10-05",
+    "label": "Oct 5 - Oct 11, 2026",
+    "shortLabel": "Oct 5 - Oct 11",
+    "totalValC": 26435,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue up 11% WoW ($26435). New clients: 25 combined.",
+    "loc": {
+      "lanham": {
+        "tv": 17751.09,
+        "rev": 10403.18,
+        "prod": 653,
+        "rb": 45.2,
+        "nc": 15,
+        "neft": "2/$698",
+        "neftC": 2,
+        "neftV": 698,
+        "reft": 4398,
+        "mcan": 0,
+        "ret": 276.91,
+        "tkt": 147,
+        "onl": 0,
+        "ug": 85,
+        "disc": 2638,
+        "pr": 0,
+        "invC": 107,
+        "rebC": 940,
+        "revCats": [
+          10403,
+          5096,
+          1060,
+          277
+        ],
+        "svc": {
+          "New Client Stretch": 360,
+          "Other": 540,
+          "Stretch @ The Loft": 1080,
+          "Enhancements": 40,
+          "Premium Services": 20,
+          "Dr Akmal": 20,
+          "Massage @ The Loft": 20
+        },
+        "bsrc": {
+          "Zenoti": 107
+        },
+        "ml": {
+          "open": 63922,
+          "sold": 5096,
+          "red": 5302,
+          "can": 0,
+          "close": 63716
+        },
+        "pl": {
+          "open": 22001,
+          "sold": 1060,
+          "red": 1103,
+          "exp": 0,
+          "close": 21958
+        }
+      },
+      "bethesda": {
+        "tv": 8683.91,
+        "rev": 5260,
+        "prod": 40,
+        "rb": 15.2,
+        "nc": 10,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 2153,
+        "mcan": 0,
+        "ret": 65.91,
+        "tkt": 292,
+        "onl": 0,
+        "ug": 25,
+        "disc": 281,
+        "pr": 0,
+        "invC": 32,
+        "rebC": 5,
+        "revCats": [
+          5260,
+          2153,
+          960,
+          66
+        ],
+        "svc": {
+          "Stretch @ The Loft": 6,
+          "Other": 15,
+          "New Client Stretch": 10,
+          "Ben The Baptist ": 2
+        },
+        "bsrc": {
+          "Zenoti": 32
+        },
+        "ml": {
+          "open": 39241,
+          "sold": 2153,
+          "red": 611,
+          "can": 0,
+          "close": 40783
+        },
+        "pl": {
+          "open": 20937,
+          "sold": 960,
+          "red": 272,
+          "exp": 0,
+          "close": 21625
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Tarah Massey",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "rec",
+        "date": "10/11",
+        "val": 599
+      },
+      {
+        "n": "Kevin Bright",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "rec",
+        "date": "10/06",
+        "val": 599
+      },
+      {
+        "n": "Carolyn Parker",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/11",
+        "val": 349
+      },
+      {
+        "n": "Bouyea Amen El",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/08",
+        "val": 349
+      },
+      {
+        "n": "Erica Patterson",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/08",
+        "val": 349
+      },
+      {
+        "n": "Renee Carrion",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "10/07",
+        "val": 349
+      },
+      {
+        "n": "Veroinca Goode",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "10/07",
+        "val": 349
+      },
+      {
+        "n": "Kiana Myles",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/05",
+        "val": 349
+      },
+      {
+        "n": "Ramona Oliver",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "10/05",
+        "val": 329
+      },
+      {
+        "n": "Shannon Thompson",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "10/09",
+        "val": 329
+      },
+      {
+        "n": "Danielle Weiss",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "10/07",
+        "val": 329
+      },
+      {
+        "n": "Joseph Swann",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/11",
+        "val": 299
+      },
+      {
+        "n": "T.Pope Pope",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/08",
+        "val": 299
+      },
+      {
+        "n": "Darius Moore",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/05",
+        "val": 299
+      },
+      {
+        "n": "Darlene Slaughter",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/05",
+        "val": 299
+      },
+      {
+        "n": "Valencia Bush",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/11",
+        "val": 299
+      },
+      {
+        "n": "Mukul Nerurkar",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/10",
+        "val": 299
+      },
+      {
+        "n": "Kerry Ann Nakouye",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/07",
+        "val": 299
+      },
+      {
+        "n": "Monica Hayes",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/07",
+        "val": 299
+      },
+      {
+        "n": "Criis Neal",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/05",
+        "val": 299
+      },
+      {
+        "n": "Toniere Lee",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/10",
+        "val": 279
+      }
+    ],
+    "combined": {
+      "tv": 26435,
+      "rev": 15663.18,
+      "nc": 25,
+      "invC": 139,
+      "apptC": 2173,
+      "cancelled": 0,
+      "noshow": 0,
+      "service": 15663.18,
+      "product": 342.82,
+      "membership": 7249,
+      "packageRev": 2020,
+      "reftC": 0,
+      "reft": 6551,
+      "pkgC": 4,
+      "pkgV": 2020
+    },
+    "mtd": {
+      "tv": 41843.87,
+      "service": 23544.42,
+      "membership": 10648,
+      "packageRev": 4720,
+      "invC": 247
+    },
+    "wow": {
+      "tv": 2588.27,
+      "tvPct": 11,
+      "service": 4143.54,
+      "servicePct": 36,
+      "nc": -1,
+      "invC": -12,
+      "membership": -676
+    },
+    "narrative": {
+      "tagline": "Revenue up 11% WoW ($26435). New clients: 25 combined.",
+      "watches": [
+        "LLM narrative unavailable: No text content. Shape={\"hasContent\":true,\"contentLen\":1,\"firstBlockType\":\"thinking\",\"stopReason\":\"max_tokens\",\"model\":\"claude-sonnet-5\",\"isError\":false,\"errorMsg\":null,\"usage\":{\"input_tokens\":1138,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":{\"ephemeral_5m_input_toke"
+      ]
+    },
+    "providersCount": 12,
+    "newEFTs": [
+      {
+        "n": "Renee Carrion",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "10/07",
+        "val": 349
+      },
+      {
+        "n": "Veroinca Goode",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "10/07",
+        "val": 349
+      }
+    ],
+    "meta": {
+      "generatedAt": "2026-10-12T03:55:26.957Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0"
+      }
+    }
   }
 ]
