@@ -1813,5 +1813,319 @@
         "pl_exp": "package expirations not derived from sales endpoint — set to 0"
       }
     }
+  },
+  {
+    "id": "2026-10-12",
+    "label": "Oct 12 - Oct 18, 2026",
+    "shortLabel": "Oct 12 - Oct 18",
+    "totalValC": 23243,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Total revenue fell 11% WoW ($23,243 vs $26,216), driven by Bethesda's 27% TV decline ($6,199 vs $8,465) and a 36% drop in membership sales ($4,642 vs $7,249).<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Rebook rate on completed visits dropped to 45.2% from 53.1% WoW - check if this reflects provider availability or client follow-through.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Lynton McCrae and Dr Akmal Muwwakkil (Lanham) each booked 0 of 14 scheduled hours with 0% rebook - confirm scheduling fit or reassign hours.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Bethesda produced zero new EFT memberships this week versus 2 at Lanham - watch membership pipeline split between locations.</span>",
+    "loc": {
+      "lanham": {
+        "tv": 17044.35,
+        "rev": 10915.24,
+        "prod": 41,
+        "rb": 41.4,
+        "nc": 19,
+        "neft": "2/$648",
+        "neftC": 2,
+        "neftV": 648,
+        "reft": 2840,
+        "mcan": 0,
+        "ret": 256.11,
+        "tkt": 154,
+        "onl": 0,
+        "ug": 72,
+        "disc": 1895,
+        "pr": 0,
+        "invC": 96,
+        "rebC": 24,
+        "revCats": [
+          10915,
+          3488,
+          1830,
+          256
+        ],
+        "svc": {
+          "Ben The Baptist ": 1,
+          "Stretch @ The Loft": 39,
+          "New Client Stretch": 19,
+          "Premium Services": 2
+        },
+        "bsrc": {
+          "Zenoti": 96
+        },
+        "ml": {
+          "open": 63716,
+          "sold": 3488,
+          "red": 3798,
+          "can": 0,
+          "close": 63406
+        },
+        "pl": {
+          "open": 21958,
+          "sold": 1830,
+          "red": 1993,
+          "exp": 0,
+          "close": 21795
+        }
+      },
+      "bethesda": {
+        "tv": 6198.8,
+        "rev": 3389.5,
+        "prod": 32.5,
+        "rb": 60,
+        "nc": 5,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 1154,
+        "mcan": 0,
+        "ret": 5.3,
+        "tkt": 188,
+        "onl": 0,
+        "ug": 25,
+        "disc": 556,
+        "pr": 0,
+        "invC": 31,
+        "rebC": 9,
+        "revCats": [
+          3390,
+          1154,
+          1440,
+          5
+        ],
+        "svc": {
+          "New Client Stretch": 5,
+          "Stretch @ The Loft": 12,
+          "Ben The Baptist ": 1
+        },
+        "bsrc": {
+          "Zenoti": 31
+        },
+        "ml": {
+          "open": 40783,
+          "sold": 1154,
+          "red": 595,
+          "can": 0,
+          "close": 41342
+        },
+        "pl": {
+          "open": 21625,
+          "sold": 1440,
+          "red": 742,
+          "exp": 0,
+          "close": 22323
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Donald Taylor",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/12",
+        "val": 349
+      },
+      {
+        "n": "Jessika Thomas",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "10/12",
+        "val": 349
+      },
+      {
+        "n": "Marcella Gutierrez",
+        "loc": "Bethesda",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/12",
+        "val": 349
+      },
+      {
+        "n": "Velesha Burke",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/18",
+        "val": 299
+      },
+      {
+        "n": "Sacoyia Todd",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/16",
+        "val": 299
+      },
+      {
+        "n": "Anthony Webb",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/15",
+        "val": 299
+      },
+      {
+        "n": "Kristely Bastien",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "new",
+        "date": "10/14",
+        "val": 299
+      },
+      {
+        "n": "Christopher Coyne",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/14",
+        "val": 299
+      },
+      {
+        "n": "LeRoy Dock",
+        "loc": "Bethesda",
+        "plan": "OLD 4 - 30 minute stretch visits monthly",
+        "type": "rec",
+        "date": "10/15",
+        "val": 297
+      },
+      {
+        "n": "Doris Cook",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/18",
+        "val": 279
+      },
+      {
+        "n": "Crystal Eubanks",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/14",
+        "val": 279
+      },
+      {
+        "n": "Vianka Hardy",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/14",
+        "val": 279
+      },
+      {
+        "n": "Keely Walston",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/13",
+        "val": 279
+      },
+      {
+        "n": "Jamal Blackwell",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/14",
+        "val": 249
+      },
+      {
+        "n": "Dana Plummer",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/12",
+        "val": 229
+      },
+      {
+        "n": "Crystal Smith",
+        "loc": "Bethesda",
+        "plan": "OLD 2- 30 min stretch visits monthly",
+        "type": "rec",
+        "date": "10/12",
+        "val": 209
+      }
+    ],
+    "combined": {
+      "tv": 23243.15,
+      "rev": 14304.74,
+      "nc": 24,
+      "prod": 38.7,
+      "rb": 45.2,
+      "completed": 73,
+      "bookedHours": 85.8,
+      "scheduledHours": 221.8,
+      "invC": 127,
+      "apptC": 79,
+      "cancelled": 6,
+      "noshow": 2,
+      "service": 14304.74,
+      "product": 261.41,
+      "membership": 4642,
+      "packageRev": 3270,
+      "reftC": 14,
+      "reft": 3994,
+      "pkgC": 5,
+      "pkgV": 3270
+    },
+    "mtd": {
+      "tv": 64868.02,
+      "service": 37630.16,
+      "membership": 15290,
+      "packageRev": 7990,
+      "invC": 374
+    },
+    "wow": {
+      "tv": -2972.85,
+      "tvPct": -11,
+      "service": -1139.44,
+      "servicePct": -7,
+      "nc": -1,
+      "invC": -12,
+      "membership": -2607
+    },
+    "narrative": {
+      "tagline": "Total revenue fell 11% WoW ($23,243 vs $26,216), driven by Bethesda's 27% TV decline ($6,199 vs $8,465) and a 36% drop in membership sales ($4,642 vs $7,249).",
+      "watches": [
+        "Rebook rate on completed visits dropped to 45.2% from 53.1% WoW - check if this reflects provider availability or client follow-through.",
+        "Lynton McCrae and Dr Akmal Muwwakkil (Lanham) each booked 0 of 14 scheduled hours with 0% rebook - confirm scheduling fit or reassign hours.",
+        "Bethesda produced zero new EFT memberships this week versus 2 at Lanham - watch membership pipeline split between locations."
+      ]
+    },
+    "providersCount": 13,
+    "newEFTs": [
+      {
+        "n": "Jessika Thomas",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "10/12",
+        "val": 349
+      },
+      {
+        "n": "Kristely Bastien",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "new",
+        "date": "10/14",
+        "val": 299
+      }
+    ],
+    "meta": {
+      "generatedAt": "2026-10-19T03:55:44.988Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0",
+        "prod": "booked hours (non-cancelled, non-blockout appointments) / scheduled hours for practitioner roles",
+        "rb": "rebooked completed appointments / completed appointments",
+        "nc": "unique guests with a New Client Stretch sale"
+      }
+    }
   }
 ]
