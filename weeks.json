@@ -2127,5 +2127,316 @@
         "nc": "unique guests with a New Client Stretch sale"
       }
     }
+  },
+  {
+    "id": "2026-10-19",
+    "label": "Oct 19 - Oct 25, 2026",
+    "shortLabel": "Oct 19 - Oct 25",
+    "totalValC": 17027,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue down 23% WoW ($17027.24). New clients: 10 combined.",
+    "loc": {
+      "lanham": {
+        "tv": 15239.33,
+        "rev": 9239.9,
+        "prod": 38.6,
+        "rb": 54.7,
+        "nc": 8,
+        "neft": "4/$1,306",
+        "neftC": 4,
+        "neftV": 1306,
+        "reft": 2992,
+        "mcan": 0,
+        "ret": 152.43,
+        "tkt": 117,
+        "onl": 0,
+        "ug": 84,
+        "disc": 2518,
+        "pr": 0,
+        "invC": 102,
+        "rebC": 35,
+        "revCats": [
+          9240,
+          4298,
+          960,
+          152
+        ],
+        "svc": {
+          "Stretch @ The Loft": 58,
+          "New Client Stretch": 8,
+          "Dr Akmal": 1
+        },
+        "bsrc": {
+          "Zenoti": 102
+        },
+        "ml": {
+          "open": 63406,
+          "sold": 4298,
+          "red": 5195,
+          "can": 0,
+          "close": 62509
+        },
+        "pl": {
+          "open": 21795,
+          "sold": 960,
+          "red": 1160,
+          "exp": 0,
+          "close": 21595
+        }
+      },
+      "bethesda": {
+        "tv": 1787.91,
+        "rev": 1282.17,
+        "prod": 22.8,
+        "rb": 27.3,
+        "nc": 2,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 299,
+        "mcan": 0,
+        "ret": 136.74,
+        "tkt": 99,
+        "onl": 0,
+        "ug": 14,
+        "disc": 363,
+        "pr": 0,
+        "invC": 16,
+        "rebC": 3,
+        "revCats": [
+          1282,
+          299,
+          0,
+          137
+        ],
+        "svc": {
+          "Stretch @ The Loft": 10,
+          "New Client Stretch": 2,
+          "Ben The Baptist ": 1
+        },
+        "bsrc": {
+          "Zenoti": 16
+        },
+        "ml": {
+          "open": 41342,
+          "sold": 299,
+          "red": 780,
+          "can": 0,
+          "close": 40861
+        },
+        "pl": {
+          "open": 22323,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 22323
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Shawn Perkins",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "rec",
+        "date": "10/20",
+        "val": 599
+      },
+      {
+        "n": "Lisa Charaf",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/25",
+        "val": 349
+      },
+      {
+        "n": "Aaron Montgomery",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "10/24",
+        "val": 349
+      },
+      {
+        "n": "Dr. Lenese Barnes Barnes",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "10/25",
+        "val": 329
+      },
+      {
+        "n": "Reshanda Adams Barnett",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "10/25",
+        "val": 329
+      },
+      {
+        "n": "Lelia Mejia",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "10/24",
+        "val": 329
+      },
+      {
+        "n": "Derek Swiney",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "10/21",
+        "val": 329
+      },
+      {
+        "n": "Natash Jones",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/22",
+        "val": 299
+      },
+      {
+        "n": "Janelle Roper",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "new",
+        "date": "10/19",
+        "val": 299
+      },
+      {
+        "n": "Barbara Bazron",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/19",
+        "val": 299
+      },
+      {
+        "n": "Dena Robinson",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/20",
+        "val": 299
+      },
+      {
+        "n": "Erika Washington",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/25",
+        "val": 279
+      },
+      {
+        "n": "Steve Walker",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/19",
+        "val": 260
+      },
+      {
+        "n": "Kelly Taylor",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/24",
+        "val": 249
+      }
+    ],
+    "combined": {
+      "tv": 17027.24,
+      "rev": 10522.07,
+      "nc": 10,
+      "prod": 34.5,
+      "rb": 50.7,
+      "completed": 75,
+      "bookedHours": 78.3,
+      "scheduledHours": 226.5,
+      "invC": 118,
+      "apptC": 80,
+      "cancelled": 6,
+      "noshow": 2,
+      "service": 10522.07,
+      "product": 289.17,
+      "membership": 4597,
+      "packageRev": 960,
+      "reftC": 10,
+      "reft": 3291,
+      "pkgC": 2,
+      "pkgV": 960
+    },
+    "mtd": {
+      "tv": 80832.26,
+      "service": 47089.23,
+      "membership": 19916,
+      "packageRev": 8950,
+      "invC": 492
+    },
+    "wow": {
+      "tv": -5152.91,
+      "tvPct": -23,
+      "service": -2719.67,
+      "servicePct": -21,
+      "nc": -14,
+      "invC": -9,
+      "membership": -45
+    },
+    "narrative": {
+      "tagline": "Revenue down 23% WoW ($17027.24). New clients: 10 combined.",
+      "watches": [
+        "LLM narrative unavailable: Unterminated string in JSON at position 427 (line 4 column 135)"
+      ]
+    },
+    "providersCount": 13,
+    "newEFTs": [
+      {
+        "n": "Aaron Montgomery",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "10/24",
+        "val": 349
+      },
+      {
+        "n": "Dr. Lenese Barnes Barnes",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "10/25",
+        "val": 329
+      },
+      {
+        "n": "Derek Swiney",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "10/21",
+        "val": 329
+      },
+      {
+        "n": "Janelle Roper",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "new",
+        "date": "10/19",
+        "val": 299
+      }
+    ],
+    "meta": {
+      "generatedAt": "2026-10-26T03:55:47.719Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0",
+        "prod": "booked hours (non-cancelled, non-blockout appointments) / scheduled hours for practitioner roles",
+        "rb": "rebooked completed appointments / completed appointments",
+        "nc": "unique guests with a New Client Stretch sale"
+      }
+    }
   }
 ]
