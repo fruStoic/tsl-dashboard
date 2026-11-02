@@ -2438,5 +2438,403 @@
         "nc": "unique guests with a New Client Stretch sale"
       }
     }
+  },
+  {
+    "id": "2026-10-26",
+    "label": "Oct 26 - Nov 1, 2026",
+    "shortLabel": "Oct 26 - Nov 1",
+    "totalValC": 19276,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue up 13% WoW ($19275.88). New clients: 13 combined.",
+    "loc": {
+      "lanham": {
+        "tv": 14953.72,
+        "rev": 5124.83,
+        "prod": 22.7,
+        "rb": 35.3,
+        "nc": 11,
+        "neft": "3/$927",
+        "neftC": 3,
+        "neftV": 927,
+        "reft": 5742,
+        "mcan": 0,
+        "ret": 98.89,
+        "tkt": 119,
+        "onl": 0,
+        "ug": 69,
+        "disc": 1025,
+        "pr": 0,
+        "invC": 85,
+        "rebC": 12,
+        "revCats": [
+          5125,
+          6669,
+          2800,
+          99
+        ],
+        "svc": {
+          "New Client Stretch": 12,
+          "Stretch @ The Loft": 23
+        },
+        "bsrc": {
+          "Zenoti": 85
+        },
+        "ml": {
+          "open": 62509,
+          "sold": 6669,
+          "red": 1928,
+          "can": 0,
+          "close": 67250
+        },
+        "pl": {
+          "open": 21595,
+          "sold": 2800,
+          "red": 810,
+          "exp": 0,
+          "close": 23585
+        }
+      },
+      "bethesda": {
+        "tv": 4322.16,
+        "rev": 3109.67,
+        "prod": 44.2,
+        "rb": 64.7,
+        "nc": 2,
+        "neft": "1/$329",
+        "neftC": 1,
+        "neftV": 329,
+        "reft": 857,
+        "mcan": 0,
+        "ret": 26.49,
+        "tkt": 164,
+        "onl": 0,
+        "ug": 21,
+        "disc": 656,
+        "pr": 0,
+        "invC": 24,
+        "rebC": 11,
+        "revCats": [
+          3110,
+          1186,
+          0,
+          26
+        ],
+        "svc": {
+          "Stretch @ The Loft": 15,
+          "New Client Stretch": 2,
+          "Ben The Baptist ": 1
+        },
+        "bsrc": {
+          "Zenoti": 24
+        },
+        "ml": {
+          "open": 40861,
+          "sold": 1186,
+          "red": 1604,
+          "can": 0,
+          "close": 40443
+        },
+        "pl": {
+          "open": 22323,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 22323
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Oliver Wendall Butler",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "rec",
+        "date": "10/28",
+        "val": 599
+      },
+      {
+        "n": "Jaclyn Johnson",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/01",
+        "val": 349
+      },
+      {
+        "n": "Alana Scott",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/01",
+        "val": 349
+      },
+      {
+        "n": "ADRIANNE GOODE",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/30",
+        "val": 349
+      },
+      {
+        "n": "Chantay Moye",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "10/28",
+        "val": 349
+      },
+      {
+        "n": "Jason Gilchrist",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "10/30",
+        "val": 329
+      },
+      {
+        "n": "Alana Pickett",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "10/30",
+        "val": 329
+      },
+      {
+        "n": "Sean Cook",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/01",
+        "val": 299
+      },
+      {
+        "n": "Sean Cook",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/01",
+        "val": 299
+      },
+      {
+        "n": "Kia McCallister-Young",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "new",
+        "date": "10/31",
+        "val": 299
+      },
+      {
+        "n": "Cindy Alcala",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "new",
+        "date": "10/31",
+        "val": 299
+      },
+      {
+        "n": "Vivian Carter",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/29",
+        "val": 299
+      },
+      {
+        "n": "Datrell Ward",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/29",
+        "val": 299
+      },
+      {
+        "n": "Kevin Jackson",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/27",
+        "val": 299
+      },
+      {
+        "n": "Staci Burrough",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/26",
+        "val": 299
+      },
+      {
+        "n": "Brian Baylor",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "10/30",
+        "val": 299
+      },
+      {
+        "n": "Marcus Mitchell",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "11/01",
+        "val": 279
+      },
+      {
+        "n": "Grace Mayberry",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/30",
+        "val": 279
+      },
+      {
+        "n": "Douglas Vereen",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/30",
+        "val": 279
+      },
+      {
+        "n": "Ashley Walter",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/28",
+        "val": 279
+      },
+      {
+        "n": "Mercedes White",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/28",
+        "val": 279
+      },
+      {
+        "n": "Kandace Latson",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/27",
+        "val": 279
+      },
+      {
+        "n": "Dominique Pender",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/26",
+        "val": 279
+      },
+      {
+        "n": "Marvin Wilson",
+        "loc": "Bethesda",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/30",
+        "val": 279
+      },
+      {
+        "n": "Jimmy Jimmy Sanders",
+        "loc": "Bethesda",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "10/27",
+        "val": 279
+      }
+    ],
+    "combined": {
+      "tv": 19275.88,
+      "rev": 8234.5,
+      "nc": 13,
+      "prod": 27.4,
+      "rb": 45.1,
+      "completed": 51,
+      "bookedHours": 54,
+      "scheduledHours": 197,
+      "invC": 109,
+      "apptC": 53,
+      "cancelled": 3,
+      "noshow": 5,
+      "service": 8234.5,
+      "product": 125.38,
+      "membership": 7855,
+      "packageRev": 2800,
+      "reftC": 21,
+      "reft": 6599,
+      "pkgC": 5,
+      "pkgV": 2800
+    },
+    "mtd": {
+      "tv": 2871.25,
+      "service": 1191.25,
+      "membership": 1575,
+      "packageRev": 0,
+      "invC": 18
+    },
+    "wow": {
+      "tv": 2248.64,
+      "tvPct": 13,
+      "service": -2287.57,
+      "servicePct": -22,
+      "nc": 3,
+      "invC": -9,
+      "membership": 3258
+    },
+    "narrative": {
+      "tagline": "Revenue up 13% WoW ($19275.88). New clients: 13 combined.",
+      "watches": [
+        "LLM narrative unavailable: No text content. Shape={\"hasContent\":true,\"contentLen\":1,\"firstBlockType\":\"thinking\",\"stopReason\":\"max_tokens\",\"model\":\"claude-sonnet-5\",\"isError\":false,\"errorMsg\":null,\"usage\":{\"input_tokens\":1347,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":{\"ephemeral_5m_input_toke"
+      ]
+    },
+    "providersCount": 11,
+    "newEFTs": [
+      {
+        "n": "Jason Gilchrist",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "10/30",
+        "val": 329
+      },
+      {
+        "n": "Alana Pickett",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "new",
+        "date": "10/30",
+        "val": 329
+      },
+      {
+        "n": "Kia McCallister-Young",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "new",
+        "date": "10/31",
+        "val": 299
+      },
+      {
+        "n": "Cindy Alcala",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "new",
+        "date": "10/31",
+        "val": 299
+      }
+    ],
+    "meta": {
+      "generatedAt": "2026-11-02T04:55:39.037Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0",
+        "prod": "booked hours (non-cancelled, non-blockout appointments) / scheduled hours for practitioner roles",
+        "rb": "rebooked completed appointments / completed appointments",
+        "nc": "unique guests with a New Client Stretch sale"
+      }
+    }
   }
 ]
