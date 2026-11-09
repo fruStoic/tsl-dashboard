@@ -2836,5 +2836,357 @@
         "nc": "unique guests with a New Client Stretch sale"
       }
     }
+  },
+  {
+    "id": "2026-11-02",
+    "label": "Nov 2 - Nov 8, 2026",
+    "shortLabel": "Nov 2 - Nov 8",
+    "totalValC": 17636,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Service revenue rose 24% WoW ($9,424 vs $7,610) on higher productivity (35.1% vs 31.2%) and rebook rate (51.7% vs 45.3%), but total revenue still fell 5% as membership sales dropped $926 ($6,929 vs $7,855), with Bethesda TV up 14% on just 2 new clients while Lanham TV fell 10% despite 15 new clients.<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Two Lanham providers (Dr. Akmal Muwwakkil, Test Practitioner) booked 0 of 27 combined scheduled hours with 0% rebook - confirm if these slots should be reallocated or providers offboarded.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Only 2 new EFT memberships signed this week, both Lanham ($698 combined) - membership sales pipeline is thin relative to the $926 WoW drop in membership revenue.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Cancellations (7) ran at 41% of new bookings (17) - watch next week's booked count to see if this holds or reverses.</span>",
+    "loc": {
+      "lanham": {
+        "tv": 13403.15,
+        "rev": 7620.32,
+        "prod": 34.8,
+        "rb": 51.1,
+        "nc": 15,
+        "neft": "2/$698",
+        "neftC": 2,
+        "neftV": 698,
+        "reft": 4028,
+        "mcan": 0,
+        "ret": 170.83,
+        "tkt": 149,
+        "onl": 0,
+        "ug": 59,
+        "disc": 1510,
+        "pr": 0,
+        "invC": 74,
+        "rebC": 23,
+        "revCats": [
+          7620,
+          4726,
+          1060,
+          171
+        ],
+        "svc": {
+          "Stretch @ The Loft": 31,
+          "New Client Stretch": 15
+        },
+        "bsrc": {
+          "Zenoti": 74
+        },
+        "ml": {
+          "open": 67250,
+          "sold": 4726,
+          "red": 3455,
+          "can": 0,
+          "close": 68521
+        },
+        "pl": {
+          "open": 23585,
+          "sold": 1060,
+          "red": 775,
+          "exp": 0,
+          "close": 23870
+        }
+      },
+      "bethesda": {
+        "tv": 4232.89,
+        "rev": 1804,
+        "prod": 36,
+        "rb": 53.3,
+        "nc": 2,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 2203,
+        "mcan": 0,
+        "ret": 15.89,
+        "tkt": 106,
+        "onl": 0,
+        "ug": 22,
+        "disc": 495,
+        "pr": 0,
+        "invC": 32,
+        "rebC": 8,
+        "revCats": [
+          1804,
+          2203,
+          0,
+          16
+        ],
+        "svc": {
+          "Stretch @ The Loft": 12,
+          "New Client Stretch": 2,
+          "Ben The Baptist ": 1
+        },
+        "bsrc": {
+          "Zenoti": 32
+        },
+        "ml": {
+          "open": 40443,
+          "sold": 2203,
+          "red": 1292,
+          "can": 0,
+          "close": 41354
+        },
+        "pl": {
+          "open": 22323,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 22323
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Kevin Bright",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "rec",
+        "date": "11/06",
+        "val": 599
+      },
+      {
+        "n": "Bouyea Amen El",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/08",
+        "val": 349
+      },
+      {
+        "n": "Erica Patterson",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/08",
+        "val": 349
+      },
+      {
+        "n": "Kimberly Spriggs",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "11/07",
+        "val": 349
+      },
+      {
+        "n": "Veroinca Goode",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/07",
+        "val": 349
+      },
+      {
+        "n": "Dian Marner",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX - NEW",
+        "type": "new",
+        "date": "11/06",
+        "val": 349
+      },
+      {
+        "n": "Claudia Chavez",
+        "loc": "Bethesda",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/04",
+        "val": 349
+      },
+      {
+        "n": "Ramona Oliver",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "11/05",
+        "val": 329
+      },
+      {
+        "n": "Danielle Weiss",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "11/07",
+        "val": 329
+      },
+      {
+        "n": "Shannon Thompson",
+        "loc": "Bethesda",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "11/06",
+        "val": 329
+      },
+      {
+        "n": "T.Pope Pope",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/08",
+        "val": 299
+      },
+      {
+        "n": "Darius Moore",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/05",
+        "val": 299
+      },
+      {
+        "n": "Darlene Slaughter",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/05",
+        "val": 299
+      },
+      {
+        "n": "Sean Cook",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/03",
+        "val": 299
+      },
+      {
+        "n": "Kiristin Reid",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/03",
+        "val": 299
+      },
+      {
+        "n": "Monica Hayes",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/07",
+        "val": 299
+      },
+      {
+        "n": "Criis Neal",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/05",
+        "val": 299
+      },
+      {
+        "n": "Danielle McCoy",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/04",
+        "val": 299
+      },
+      {
+        "n": "Isaiah Akomeah",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/03",
+        "val": 299
+      },
+      {
+        "n": "Terri Williams",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "11/06",
+        "val": 279
+      },
+      {
+        "n": "Brenda Fleming",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "11/02",
+        "val": 279
+      }
+    ],
+    "combined": {
+      "tv": 17636.04,
+      "rev": 9424.32,
+      "nc": 17,
+      "prod": 35.1,
+      "rb": 51.7,
+      "completed": 60,
+      "bookedHours": 62.5,
+      "scheduledHours": 178,
+      "invC": 106,
+      "apptC": 61,
+      "cancelled": 7,
+      "noshow": 0,
+      "service": 9424.32,
+      "product": 186.72,
+      "membership": 6929,
+      "packageRev": 1060,
+      "reftC": 19,
+      "reft": 6231,
+      "pkgC": 2,
+      "pkgV": 1060
+    },
+    "mtd": {
+      "tv": 20507.29,
+      "service": 10615.57,
+      "membership": 8155,
+      "packageRev": 1060,
+      "invC": 125
+    },
+    "wow": {
+      "tv": -1014.84,
+      "tvPct": -5,
+      "service": 1814.82,
+      "servicePct": 24,
+      "nc": 4,
+      "invC": -3,
+      "membership": -926
+    },
+    "narrative": {
+      "tagline": "Service revenue rose 24% WoW ($9,424 vs $7,610) on higher productivity (35.1% vs 31.2%) and rebook rate (51.7% vs 45.3%), but total revenue still fell 5% as membership sales dropped $926 ($6,929 vs $7,855), with Bethesda TV up 14% on just 2 new clients while Lanham TV fell 10% despite 15 new clients.",
+      "watches": [
+        "Two Lanham providers (Dr. Akmal Muwwakkil, Test Practitioner) booked 0 of 27 combined scheduled hours with 0% rebook - confirm if these slots should be reallocated or providers offboarded.",
+        "Only 2 new EFT memberships signed this week, both Lanham ($698 combined) - membership sales pipeline is thin relative to the $926 WoW drop in membership revenue.",
+        "Cancellations (7) ran at 41% of new bookings (17) - watch next week's booked count to see if this holds or reverses."
+      ]
+    },
+    "providersCount": 12,
+    "newEFTs": [
+      {
+        "n": "Kimberly Spriggs",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "new",
+        "date": "11/07",
+        "val": 349
+      },
+      {
+        "n": "Dian Marner",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX - NEW",
+        "type": "new",
+        "date": "11/06",
+        "val": 349
+      }
+    ],
+    "meta": {
+      "generatedAt": "2026-11-09T04:55:38.990Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0",
+        "prod": "booked hours (non-cancelled, non-blockout appointments) / scheduled hours for practitioner roles",
+        "rb": "rebooked completed appointments / completed appointments",
+        "nc": "unique guests with a New Client Stretch sale"
+      }
+    }
   }
 ]
