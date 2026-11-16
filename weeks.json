@@ -3188,5 +3188,292 @@
         "nc": "unique guests with a New Client Stretch sale"
       }
     }
+  },
+  {
+    "id": "2026-11-09",
+    "label": "Nov 9 - Nov 15, 2026",
+    "shortLabel": "Nov 9 - Nov 15",
+    "totalValC": 13561,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Total revenue fell 23% WoW to $13,561 from $17,636, driven by Lanham's drop to $10,282 (from $13,403) and combined provider productivity falling to 24% from 35.1%.<br><br><strong>Watch next week:</strong> <span style=\"display:inline-block;margin-right:14px;\">&bull; Three Lanham providers (Atanga, Muwwakkil, Walker) logged 0 booked hours against 41 combined scheduled hours - confirm whether this is a scheduling, staffing, or demand issue before next week's hours are set.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; New-client pipeline went negative: 7 cancellations and 4 no-shows against only 6 new bookings - watch if this persists into next week.</span><span style=\"display:inline-block;margin-right:14px;\">&bull; Zero new EFT memberships signed despite $4,985 in membership sales - confirm whether this week's sales were renewals/upgrades only, since MTD membership revenue ($12,841) depends on new sign-ups to sustain pace.</span>",
+    "loc": {
+      "lanham": {
+        "tv": 10282.12,
+        "rev": 6520.83,
+        "prod": 24.5,
+        "rb": 43.3,
+        "nc": 4,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 3530,
+        "mcan": 0,
+        "ret": 5.29,
+        "tkt": 139,
+        "onl": 0,
+        "ug": 54,
+        "disc": 969,
+        "pr": 0,
+        "invC": 72,
+        "rebC": 13,
+        "revCats": [
+          6521,
+          3530,
+          0,
+          5
+        ],
+        "svc": {
+          "Stretch @ The Loft": 31,
+          "New Client Stretch": 4
+        },
+        "bsrc": {
+          "Zenoti": 72
+        },
+        "ml": {
+          "open": 68521,
+          "sold": 3530,
+          "red": 3229,
+          "can": 0,
+          "close": 68822
+        },
+        "pl": {
+          "open": 23870,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 23870
+        }
+      },
+      "bethesda": {
+        "tv": 3278.88,
+        "rev": 1658.5,
+        "prod": 22.5,
+        "rb": 63.6,
+        "nc": 2,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 1455,
+        "mcan": 0,
+        "ret": 130.38,
+        "tkt": 151,
+        "onl": 0,
+        "ug": 17,
+        "disc": 412,
+        "pr": 0,
+        "invC": 18,
+        "rebC": 7,
+        "revCats": [
+          1659,
+          1455,
+          0,
+          130
+        ],
+        "svc": {
+          "Stretch @ The Loft": 8,
+          "Ben The Baptist ": 1,
+          "New Client Stretch": 2
+        },
+        "bsrc": {
+          "Zenoti": 18
+        },
+        "ml": {
+          "open": 41354,
+          "sold": 1455,
+          "red": 958,
+          "can": 0,
+          "close": 41851
+        },
+        "pl": {
+          "open": 22323,
+          "sold": 0,
+          "red": 0,
+          "exp": 0,
+          "close": 22323
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Tarah Massey",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "rec",
+        "date": "11/11",
+        "val": 599
+      },
+      {
+        "n": "Darrell Smith",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "rec",
+        "date": "11/09",
+        "val": 599
+      },
+      {
+        "n": "Carolyn Parker",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/11",
+        "val": 349
+      },
+      {
+        "n": "Renee Carrion",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/10",
+        "val": 349
+      },
+      {
+        "n": "Marcella Gutierrez",
+        "loc": "Bethesda",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/12",
+        "val": 349
+      },
+      {
+        "n": "Anthony Webb",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/15",
+        "val": 299
+      },
+      {
+        "n": "Joseph Swann",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/11",
+        "val": 299
+      },
+      {
+        "n": "Christopher Coyne",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/14",
+        "val": 299
+      },
+      {
+        "n": "Valencia Bush",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/11",
+        "val": 299
+      },
+      {
+        "n": "Mukul Nerurkar",
+        "loc": "Bethesda",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/10",
+        "val": 299
+      },
+      {
+        "n": "Vianka Hardy",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "11/14",
+        "val": 279
+      },
+      {
+        "n": "Toniere Lee",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "11/10",
+        "val": 279
+      },
+      {
+        "n": "Jamal Blackwell",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "11/14",
+        "val": 249
+      },
+      {
+        "n": "Dana Plummer",
+        "loc": "Lanham",
+        "plan": "Donotuse-Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "11/12",
+        "val": 229
+      },
+      {
+        "n": "Crystal Smith",
+        "loc": "Bethesda",
+        "plan": "OLD 2- 30 min stretch visits monthly",
+        "type": "rec",
+        "date": "11/12",
+        "val": 209
+      }
+    ],
+    "combined": {
+      "tv": 13561,
+      "rev": 8179.33,
+      "nc": 6,
+      "prod": 24,
+      "rb": 48.8,
+      "completed": 41,
+      "bookedHours": 46.3,
+      "scheduledHours": 193,
+      "invC": 90,
+      "apptC": 46,
+      "cancelled": 7,
+      "noshow": 4,
+      "service": 8179.33,
+      "product": 135.67,
+      "membership": 4985,
+      "packageRev": 0,
+      "reftC": 15,
+      "reft": 4985,
+      "pkgC": 0,
+      "pkgV": 0
+    },
+    "mtd": {
+      "tv": 34068.29,
+      "service": 18794.9,
+      "membership": 12841,
+      "packageRev": 1060,
+      "invC": 215
+    },
+    "wow": {
+      "tv": -4075.04,
+      "tvPct": -23,
+      "service": -1244.99,
+      "servicePct": -13,
+      "nc": -11,
+      "invC": -16,
+      "membership": -1944
+    },
+    "narrative": {
+      "tagline": "Total revenue fell 23% WoW to $13,561 from $17,636, driven by Lanham's drop to $10,282 (from $13,403) and combined provider productivity falling to 24% from 35.1%.",
+      "watches": [
+        "Three Lanham providers (Atanga, Muwwakkil, Walker) logged 0 booked hours against 41 combined scheduled hours - confirm whether this is a scheduling, staffing, or demand issue before next week's hours are set.",
+        "New-client pipeline went negative: 7 cancellations and 4 no-shows against only 6 new bookings - watch if this persists into next week.",
+        "Zero new EFT memberships signed despite $4,985 in membership sales - confirm whether this week's sales were renewals/upgrades only, since MTD membership revenue ($12,841) depends on new sign-ups to sustain pace."
+      ]
+    },
+    "providersCount": 11,
+    "newEFTs": [],
+    "meta": {
+      "generatedAt": "2026-11-16T04:55:39.213Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0",
+        "prod": "booked hours (non-cancelled, non-blockout appointments) / scheduled hours for practitioner roles",
+        "rb": "rebooked completed appointments / completed appointments",
+        "nc": "unique guests with a New Client Stretch sale"
+      }
+    }
   }
 ]
