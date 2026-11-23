@@ -3475,5 +3475,208 @@
         "nc": "unique guests with a New Client Stretch sale"
       }
     }
+  },
+  {
+    "id": "2026-11-16",
+    "label": "Nov 16 - Nov 22, 2026",
+    "shortLabel": "Nov 16 - Nov 22",
+    "totalValC": 11235,
+    "isAuto": true,
+    "alert": "<span style=\"background:#111;color:#BBC4CB;padding:2px 8px;font-family:Oswald,sans-serif;font-size:10px;letter-spacing:2px;margin-right:8px;\">AUTO</span>Revenue down 16% WoW ($11234.86). New clients: 11 combined.",
+    "loc": {
+      "lanham": {
+        "tv": 9002.9,
+        "rev": 6314.49,
+        "prod": 30.3,
+        "rb": 59.5,
+        "nc": 11,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 1816,
+        "mcan": 0,
+        "ret": 47.41,
+        "tkt": 140,
+        "onl": 0,
+        "ug": 49,
+        "disc": 1030,
+        "pr": 0,
+        "invC": 60,
+        "rebC": 25,
+        "revCats": [
+          6314,
+          1816,
+          580,
+          47
+        ],
+        "svc": {
+          "Stretch @ The Loft": 31,
+          "New Client Stretch": 11
+        },
+        "bsrc": {
+          "Zenoti": 60
+        },
+        "ml": {
+          "open": 68822,
+          "sold": 1816,
+          "red": 2307,
+          "can": 0,
+          "close": 68331
+        },
+        "pl": {
+          "open": 23870,
+          "sold": 580,
+          "red": 737,
+          "exp": 0,
+          "close": 23713
+        }
+      },
+      "bethesda": {
+        "tv": 2231.96,
+        "rev": 1606.67,
+        "prod": 36,
+        "rb": 77.8,
+        "nc": 0,
+        "neft": "0/$0",
+        "neftC": 0,
+        "neftV": 0,
+        "reft": 0,
+        "mcan": 0,
+        "ret": 5.29,
+        "tkt": 161,
+        "onl": 0,
+        "ug": 13,
+        "disc": 364,
+        "pr": 0,
+        "invC": 16,
+        "rebC": 7,
+        "revCats": [
+          1607,
+          0,
+          480,
+          5
+        ],
+        "svc": {
+          "Stretch @ The Loft": 9
+        },
+        "bsrc": {
+          "Zenoti": 16
+        },
+        "ml": {
+          "open": 41851,
+          "sold": 0,
+          "red": 0,
+          "can": 0,
+          "close": 41851
+        },
+        "pl": {
+          "open": 22323,
+          "sold": 480,
+          "red": 985,
+          "exp": 0,
+          "close": 21818
+        }
+      }
+    },
+    "memberships": [
+      {
+        "n": "Shawn Perkins",
+        "loc": "Lanham",
+        "plan": "FAMILY FLEX",
+        "type": "rec",
+        "date": "11/20",
+        "val": 599
+      },
+      {
+        "n": "Donald Taylor",
+        "loc": "Lanham",
+        "plan": "LIFESTYLE FLEX",
+        "type": "rec",
+        "date": "11/21",
+        "val": 349
+      },
+      {
+        "n": "Derek Swiney",
+        "loc": "Lanham",
+        "plan": "PARTNER FLEX",
+        "type": "rec",
+        "date": "11/21",
+        "val": 329
+      },
+      {
+        "n": "Doris Cook",
+        "loc": "Lanham",
+        "plan": "Stretch Flex Plan 2(50 min. sessions Per Month)",
+        "type": "rec",
+        "date": "11/18",
+        "val": 279
+      },
+      {
+        "n": "Steve Walker",
+        "loc": "Lanham",
+        "plan": "NEW Flex Plan 2x Month Membership",
+        "type": "rec",
+        "date": "11/19",
+        "val": 260
+      }
+    ],
+    "combined": {
+      "tv": 11234.86,
+      "rev": 7921.16,
+      "nc": 11,
+      "prod": 31.3,
+      "rb": 62.7,
+      "completed": 51,
+      "bookedHours": 48.8,
+      "scheduledHours": 156,
+      "invC": 76,
+      "apptC": 51,
+      "cancelled": 2,
+      "noshow": 2,
+      "service": 7921.16,
+      "product": 52.7,
+      "membership": 1816,
+      "packageRev": 1060,
+      "reftC": 5,
+      "reft": 1816,
+      "pkgC": 2,
+      "pkgV": 1060
+    },
+    "mtd": {
+      "tv": 45053.15,
+      "service": 26466.06,
+      "membership": 14657,
+      "packageRev": 2120,
+      "invC": 290
+    },
+    "wow": {
+      "tv": -2076.14,
+      "tvPct": -16,
+      "service": -8.17,
+      "servicePct": 0,
+      "nc": 5,
+      "invC": -13,
+      "membership": -3169
+    },
+    "narrative": {
+      "tagline": "Revenue down 16% WoW ($11234.86). New clients: 11 combined.",
+      "watches": [
+        "LLM narrative unavailable: Unterminated string in JSON at position 594 (line 5 column 157)"
+      ]
+    },
+    "providersCount": 9,
+    "newEFTs": [],
+    "meta": {
+      "generatedAt": "2026-11-23T04:55:41.432Z",
+      "narrativeSource": "claude-sonnet-5",
+      "priorWeekChained": true,
+      "notes": {
+        "ml_red": "membership redemption split from services.redeemed proportional to membership sold ratio",
+        "pl_exp": "package expirations not derived from sales endpoint — set to 0",
+        "prod": "booked hours (non-cancelled, non-blockout appointments) / scheduled hours for practitioner roles",
+        "rb": "rebooked completed appointments / completed appointments",
+        "nc": "unique guests with a New Client Stretch sale"
+      }
+    }
   }
 ]
